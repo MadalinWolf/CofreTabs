@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CofreTabs — Your tabs. Your vault. Your device.</title>
+  <meta name="description" content="CofreTabs is a local-only, retro terminal tab vault for Chromium browsers. Save, search, organize and restore tabs with no accounts, no cloud and no tracking.">
+  <meta name="theme-color" content="#080b08">
+  <meta property="og:title" content="CofreTabs — Your tabs. Your vault. Your device.">
+  <meta property="og:description" content="A local-only tab vault with a retro terminal soul. No accounts. No cloud. No tracking.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="CofreTabs home">
+        <img src="assets/icon128.png" width="32" height="32" alt="">
+        <span>COFRETABS</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#install">Install</a>
+        <a class="nav-github" href="https://github.com/MadalinWolf" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="prompt" aria-hidden="true">madwolf@studio:~$ <span class="cursor">_</span></p>
+          <p class="eyebrow">LOCAL-ONLY TAB VAULT // V1.0.0</p>
+          <h1>Your tabs.<br>Your vault.<br><span class="accent">Your device.</span></h1>
+          <p class="lede">CofreTabs turns the tab you are reading into a permanent, searchable entry in a private vault. No account. No sync. No cloud. Just the pages you chose to keep, on the machine you chose to keep them on.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#install">Install from source</a>
+            <a class="button" href="https://github.com/MadalinWolf" rel="noopener">View on GitHub</a>
+          </div>
+          <p class="status-line"><span class="dot" aria-hidden="true"></span> Status: release candidate. Not yet on the Chrome Web Store.</p>
+        </div>
+
+        <div class="terminal-card" aria-label="CofreTabs panel preview">
+          <div class="terminal-bar">
+            <span class="terminal-title">COFRETABS // PANEL</span>
+            <span class="terminal-close" aria-hidden="true">[x]</span>
+          </div>
+          <div class="terminal-body">
+            <p class="dim">// detected page</p>
+            <p class="file-title">The Unreasonable Effectiveness of Simple Tools</p>
+            <p class="url">example.com/notes/simple-tools</p>
+            <dl class="meta-grid">
+              <div><dt>host</dt><dd>example.com</dd></div>
+              <div><dt>folder</dt><dd class="accent">Example</dd></div>
+              <div><dt>status</dt><dd>ready</dd></div>
+              <div><dt>vault</dt><dd>local</dd></div>
+            </dl>
+            <div class="terminal-rule" aria-hidden="true"></div>
+            <p class="dim">// nothing is written until you press save</p>
+            <div class="fake-button">&#9654; SAVE THIS TAB</div>
+            <p class="faint">[esc] close &nbsp; [enter] save</p>
+          </div>
+        </div>
+      </div>
+      <div class="scanline" aria-hidden="true"></div>
+    </section>
+
+    <section class="strip" aria-label="Principles">
+      <div class="wrap strip-inner">
+        <span>[ LOCAL ONLY ]</span>
+        <span>[ NO ACCOUNTS ]</span>
+        <span>[ NO CLOUD ]</span>
+        <span>[ NO TRACKING ]</span>
+        <span>[ MIT LICENSED ]</span>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="wrap">
+        <p class="section-kicker">// 01 — WHAT IT DOES</p>
+        <h2>A vault, not another inbox.</h2>
+        <p class="section-lede">Built for research trails, read-later piles and the tabs you refuse to close. Deliberately small, deliberately local.</p>
+
+        <div class="feature-grid">
+          <article class="feature">
+            <span class="feature-index">01</span>
+            <h3>Explicit saving</h3>
+            <p>Review the title, host, folder and duplicate status first. The vault changes only when you press <strong>SAVE THIS TAB</strong>.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-index">02</span>
+            <h3>Honest progress</h3>
+            <p>The save animation is tied to the real IndexedDB write. Success means saved. Failure stays a failure. No optimistic lies.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-index">03</span>
+            <h3>Real website folders</h3>
+            <p>Bundled Public Suffix List rules group <span class="mono">news.bbc.co.uk</span> under BBC — not under <span class="mono">co.uk</span>.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-index">04</span>
+            <h3>Search everything</h3>
+            <p>Titles, URLs, hostnames, folders and notes. Sort by newest, oldest, title, domain or folder. Filter to Trash when needed.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-index">05</span>
+            <h3>Trash with a way back</h3>
+            <p>Folder deletion moves tabs to Trash instead of destroying them. Permanent deletion exists — behind a confirmation.</p>
+          </article>
+          <article class="feature">
+            <span class="feature-index">06</span>
+            <h3>Portable backups</h3>
+            <p>Versioned JSON export, validated all-or-nothing import, merge or replace. Your data remains a file you own.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt shot-section" aria-labelledby="shot-title">
+      <div class="wrap">
+        <p class="section-kicker">// REAL UI — DEMO DATA</p>
+        <h2 id="shot-title">The library, as it ships.</h2>
+        <p class="section-lede">Search, folders, notes and Trash in one local database. This capture comes from the actual extension build, populated with demo entries.</p>
+        <figure class="shot-frame">
+          <img src="assets/screenshot-library.png" width="1440" height="1000" loading="lazy" alt="CofreTabs library interface showing a searchable list of seven demo saved tabs, six website folders and local-only status.">
+          <figcaption><span class="dim">$</span> cofretabs --library <span class="dim">// demo data, no personal browsing history</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="wrap">
+        <p class="section-kicker">// 02 — HOW IT WORKS</p>
+        <h2>Three steps. No account.</h2>
+        <ol class="steps">
+          <li>
+            <span class="step-number">1</span>
+            <div>
+              <h3>Click the toolbar icon</h3>
+              <p>The panel slides in on the right. It reads the current tab only after that click, using <span class="mono">activeTab</span>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <div>
+              <h3>Review, then save</h3>
+              <p>Nothing is captured automatically. Duplicate and restricted-page states are shown before you commit.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <div>
+              <h3>Find it later</h3>
+              <p>Search the library, edit notes, move folders, restore from Trash or export a backup. The vault lives in your browser profile.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="wrap privacy-grid">
+        <div>
+          <p class="section-kicker">// 03 — PRIVACY</p>
+          <h2>Nothing leaves the machine.</h2>
+          <p class="section-lede">No backend exists to receive your data. That is an architectural choice, not a promise in a policy footer.</p>
+          <a class="text-link" href="privacy.html">Read the full privacy policy →</a>
+        </div>
+        <ul class="checks">
+          <li>Vault stored in IndexedDB in your browser profile</li>
+          <li>No accounts, analytics, telemetry or ads</li>
+          <li>No remote scripts, fonts, styles or favicons</li>
+          <li>No host permissions; only <span class="mono">activeTab</span> + <span class="mono">scripting</span></li>
+          <li>Saved text rendered as text, never HTML</li>
+          <li>Backups created locally, downloaded by you</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="install">
+      <div class="wrap install-grid">
+        <div>
+          <p class="section-kicker">// 04 — INSTALL</p>
+          <h2>Load it yourself.</h2>
+          <p class="section-lede">There is no store listing yet. The honest install path today is an unpacked developer build. The repository URL below is the intended location; it is not public until the owner publishes it.</p>
+          <ol class="install-steps">
+            <li>Clone or download the repository.</li>
+            <li>Run <code>npm install</code> then <code>npm run build</code>.</li>
+            <li>Open <code>chrome://extensions</code>.</li>
+            <li>Enable <strong>Developer mode</strong>.</li>
+            <li>Choose <strong>Load unpacked</strong> and select <code>dist/</code>.</li>
+          </ol>
+          <p class="faint">Chrome 102+, Edge, Brave, Vivaldi or Opera. Only http(s) pages can be saved.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-card-head">terminal // after repository publication</div>
+          <pre><code><span class="dim">$</span> git clone https://github.com/MadalinWolf/CofreTabs.git
+<span class="dim">$</span> cd CofreTabs
+<span class="dim">$</span> npm install
+<span class="dim">$</span> npm run build
+<span class="accent">Built CofreTabs v1.0.0 → dist/</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section status-section">
+      <div class="wrap">
+        <p class="section-kicker">// 05 — RELEASE STATUS</p>
+        <h2>Published? Not yet.</h2>
+        <p class="section-lede">This site is a prepared static package, not a live storefront. The project owner still needs to publish the GitHub repository, submit the extension and deploy this page. No download button here pretends otherwise.</p>
+        <dl class="status-table">
+          <div><dt>Source + tests</dt><dd class="ok">Complete locally</dd></div>
+          <div><dt>GitHub repository</dt><dd class="warn">Not published</dd></div>
+          <div><dt>Chrome Web Store</dt><dd class="warn">Not submitted</dd></div>
+          <div><dt>Website</dt><dd class="warn">Not deployed</dd></div>
+          <div><dt>Donation link</dt><dd class="warn">TODO: ADD DONATION LINK</dd></div>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-brand">COFRETABS</p>
+        <p class="faint">Your tabs. Your vault. Your device.</p>
+        <p class="faint">MIT © 2026 Mad Wolf Studios.</p>
+      </div>
+      <div>
+        <p class="footer-head">Project</p>
+        <a href="https://github.com/MadalinWolf" rel="noopener">GitHub</a>
+        <a href="https://madwolfstudios.com/" rel="noopener">Mad Wolf Studios</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+      <div>
+        <p class="footer-head">Support</p>
+        <a href="https://madwolfstudios.com/" rel="noopener">Contact the studio</a>
+        <a href="#install">Install guide</a>
+        <span class="todo">Donate: TODO: ADD DONATION LINK</span>
+      </div>
+    </div>
+    <div class="wrap footer-bottom">
+      <p><span class="dim">madwolf@studio:~$</span> echo "thanks for reading" <span class="cursor">_</span></p>
+    </div>
+  </footer>
+</body>
+</html>

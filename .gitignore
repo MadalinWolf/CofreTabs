@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build and release artifacts (regenerate with `npm run build` / `npm run package`)
+dist/
+release/
+.test-build/
+.test-release/
+*.zip
+
+# Local environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+.github/local/
+
+# Editor and OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs and temporary files
+logs/
+*.log
+tmp/
+temp/
+.cache/
+coverage/
+.playwright/
+screenshots/local/
+
+# Local browser profiles used for manual QA
+.brave-profile/
+.chrome-profile/

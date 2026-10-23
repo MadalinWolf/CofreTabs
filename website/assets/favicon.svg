@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="CofreTabs">
+  <title>CofreTabs</title>
+  <rect width="64" height="64" rx="12" fill="#080B08"/>
+  <path d="M14 8h33l8 8v40H9V12c0-2.2 1.8-4 4-4z" fill="#101610" stroke="#39FF72" stroke-width="2"/>
+  <path d="M39 10.5h11v9H39z" fill="#070A07" stroke="#20C85A" stroke-width="1"/>
+  <rect x="15" y="29" width="34" height="20" fill="#070A07" stroke="#20C85A" stroke-width="1"/>
+  <path d="M20 34l6 4.5-6 4.5" fill="none" stroke="#39FF72" stroke-width="2.6"/>
+  <path d="M30 42.5h11" stroke="#39FF72" stroke-width="2.6"/>
+</svg>

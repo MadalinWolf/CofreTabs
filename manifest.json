@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "CofreTabs",
+  "short_name": "CofreTabs",
+  "version": "1.0.0",
+  "description": "Your tabs. Your vault. Your device. A retro, local-only tab vault with no accounts and no cloud.",
+  "author": "Mad Wolf Studios",
+  "homepage_url": "https://madwolfstudios.com/",
+  "minimum_chrome_version": "102",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_title": "Open CofreTabs",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/styles/panel.css"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

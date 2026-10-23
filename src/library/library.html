@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>CofreTabs — Library</title>
+    <meta name="description" content="Your local CofreTabs vault. No accounts, no cloud, no tracking." />
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg" />
+    <link rel="stylesheet" href="../styles/library.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to vault</a>
+
+    <div class="app">
+      <aside class="sidebar" aria-label="Vault navigation">
+        <div class="brand">
+          <img class="brand-logo" src="../../assets/icons/logo.svg" alt="" width="44" height="44" />
+          <div class="brand-text">
+            <span class="brand-name">COFRETABS</span>
+            <span class="brand-tag">Your tabs. Your vault.</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Vault views">
+          <button class="nav-item" type="button" data-view="all">
+            <span class="nav-prompt" aria-hidden="true">&gt;</span>
+            <span class="nav-label">ALL TABS</span>
+            <span class="nav-count" id="nav-count-all">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="recent">
+            <span class="nav-prompt" aria-hidden="true">&gt;</span>
+            <span class="nav-label">RECENT</span>
+          </button>
+          <button class="nav-item" type="button" data-view="folders">
+            <span class="nav-prompt" aria-hidden="true">&gt;</span>
+            <span class="nav-label">FOLDERS</span>
+            <span class="nav-count" id="nav-count-folders">0</span>
+          </button>
+          <button class="nav-item" type="button" data-view="trash">
+            <span class="nav-prompt" aria-hidden="true">&gt;</span>
+            <span class="nav-label">TRASH</span>
+            <span class="nav-count" id="nav-count-trash">0</span>
+          </button>
+        </nav>
+
+        <section class="side-section" aria-labelledby="side-folders-title">
+          <div class="side-head">
+            <h2 id="side-folders-title">WEBSITE FOLDERS</h2>
+            <span class="side-meta" id="folder-count">0</span>
+          </div>
+          <div class="folder-list" id="folder-list"></div>
+        </section>
+
+        <section class="side-section data-section" aria-labelledby="side-data-title">
+          <div class="side-head">
+            <h2 id="side-data-title">VAULT DATA</h2>
+          </div>
+          <button class="btn btn-ghost btn-block" type="button" id="btn-export">EXPORT BACKUP</button>
+          <button class="btn btn-ghost btn-block" type="button" id="btn-import">IMPORT BACKUP</button>
+          <a class="side-link" href="privacy.html">PRIVACY POLICY</a>
+          <a class="side-link" href="https://github.com/MadalinWolf" target="_blank" rel="noopener noreferrer">
+            GITHUB PROFILE <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+
+        <footer class="side-footer">
+          <div class="storage-line" id="storage-line">0 saved · 0 folders</div>
+          <div class="local-line"><span class="dot" aria-hidden="true">●</span> LOCAL ONLY · NO CLOUD</div>
+          <div class="studio-line">
+            <span id="version-label">v1.0.0</span> ·
+            <a href="https://madwolfstudios.com/" target="_blank" rel="noopener noreferrer">MAD WOLF STUDIOS</a>
+          </div>
+        </footer>
+      </aside>
+
+      <main class="main" id="main" tabindex="-1">
+        <header class="topbar">
+          <div class="title-block">
+            <span class="kicker" id="view-kicker">VAULT</span>
+            <h1 class="view-title" id="view-title">ALL TABS</h1>
+          </div>
+
+          <div class="top-actions">
+            <div class="search-wrap">
+              <span class="search-prompt" aria-hidden="true">&gt;</span>
+              <input
+                class="search-input"
+                id="search-input"
+                type="search"
+                placeholder="search title, url, hostname, note..."
+                aria-label="Search the vault"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <label class="sort-wrap">
+              <span class="sort-label">SORT</span>
+              <select id="sort-select" class="sort-select">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="title">Title A–Z</option>
+                <option value="folder">Folder A–Z</option>
+              </select>
+            </label>
+            <div class="context-actions" id="context-actions"></div>
+            <button class="btn btn-primary" type="button" id="btn-add">+ ADD TAB</button>
+          </div>
+        </header>
+
+        <div class="notice" id="notice" hidden>
+          <div class="notice-text" id="notice-text"></div>
+          <div class="notice-actions" id="notice-actions"></div>
+          <button class="notice-close" type="button" id="notice-close" aria-label="Dismiss notice">×</button>
+        </div>
+
+        <div class="list-head">
+          <span id="result-count">0 TABS</span>
+          <span class="list-head-right">
+            <span class="local-badge"><span aria-hidden="true">●</span> INDEXEDDB · ON DEVICE</span>
+          </span>
+        </div>
+
+        <section class="content" id="content" aria-busy="false"></section>
+
+        <div class="load-more-wrap" id="load-more-wrap" hidden>
+          <button class="btn btn-ghost" type="button" id="btn-load-more">LOAD MORE</button>
+        </div>
+
+        <footer class="main-footer">
+          <span>CofreTabs stores everything in your browser profile. Export a backup before clearing browser data.</span>
+          <span class="footer-links">
+            <a href="privacy.html">PRIVACY</a>
+            <a href="https://madwolfstudios.com/" target="_blank" rel="noopener noreferrer">MADWOLFSTUDIOS.COM</a>
+          </span>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Manual add -->
+    <dialog class="dialog" id="dialog-add" aria-labelledby="dialog-add-title">
+      <form method="dialog" class="dialog-body" id="form-add" novalidate>
+        <div class="dialog-head">
+          <h2 id="dialog-add-title">ADD TAB MANUALLY</h2>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <p class="dialog-hint">
+          The toolbar panel detects pages for you. This form is here for restricted pages and quick manual saves.
+        </p>
+        <label class="field">
+          <span class="field-label">PAGE URL <span class="required">(required)</span></span>
+          <input id="add-url" name="url" type="url" inputmode="url" required maxlength="8000" placeholder="https://example.com/page" />
+        </label>
+        <label class="field">
+          <span class="field-label">TITLE <span class="optional">(optional)</span></span>
+          <input id="add-title" name="title" type="text" maxlength="500" placeholder="Leave blank to use the hostname" />
+        </label>
+        <p class="form-error" id="add-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>CANCEL</button>
+          <button class="btn btn-primary" type="submit" id="add-submit">&gt; SAVE TO VAULT</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Edit -->
+    <dialog class="dialog" id="dialog-edit" aria-labelledby="dialog-edit-title">
+      <form method="dialog" class="dialog-body" id="form-edit" novalidate>
+        <div class="dialog-head">
+          <h2 id="dialog-edit-title">EDIT SAVED TAB</h2>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <div class="field">
+          <span class="field-label">URL</span>
+          <div class="readonly-url" id="edit-url"></div>
+        </div>
+        <label class="field">
+          <span class="field-label">TITLE</span>
+          <input id="edit-title" name="title" type="text" maxlength="500" required />
+        </label>
+        <label class="field">
+          <span class="field-label">FOLDER</span>
+          <select id="edit-folder" name="folder"></select>
+        </label>
+        <label class="field">
+          <span class="field-label">NOTE <span class="optional">(optional, 2000 chars max)</span></span>
+          <textarea id="edit-note" name="note" rows="4" maxlength="2000" placeholder="Why did you save this page?"></textarea>
+        </label>
+        <p class="form-error" id="edit-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>CANCEL</button>
+          <button class="btn btn-primary" type="submit" id="edit-submit">&gt; SAVE CHANGES</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Folder rename -->
+    <dialog class="dialog" id="dialog-folder" aria-labelledby="dialog-folder-title">
+      <form method="dialog" class="dialog-body" id="form-folder" novalidate>
+        <div class="dialog-head">
+          <h2 id="dialog-folder-title">RENAME FOLDER</h2>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <p class="dialog-hint">Renaming a folder only changes its label. Saved tabs keep their pages and timestamps.</p>
+        <label class="field">
+          <span class="field-label">FOLDER NAME</span>
+          <input id="folder-name" name="name" type="text" maxlength="60" required />
+        </label>
+        <p class="form-error" id="folder-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>CANCEL</button>
+          <button class="btn btn-primary" type="submit" id="folder-submit">&gt; RENAME</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Confirm -->
+    <dialog class="dialog" id="dialog-confirm" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+      <div class="dialog-body">
+        <div class="dialog-head">
+          <h2 id="confirm-title">CONFIRM</h2>
+          <button class="dialog-close" type="button" id="confirm-cancel-x" aria-label="Close">×</button>
+        </div>
+        <p class="dialog-message" id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" id="confirm-cancel">CANCEL</button>
+          <button class="btn btn-danger" type="button" id="confirm-ok">CONFIRM</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Import -->
+    <dialog class="dialog" id="dialog-import" aria-labelledby="dialog-import-title">
+      <div class="dialog-body">
+        <div class="dialog-head">
+          <h2 id="dialog-import-title">IMPORT BACKUP</h2>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <p class="dialog-hint">
+          Backups are read locally. Nothing is uploaded. Merge keeps your current vault; replace clears it first.
+        </p>
+        <label class="field">
+          <span class="field-label">BACKUP FILE (.JSON)</span>
+          <input id="import-file" type="file" accept="application/json,.json" />
+        </label>
+        <div class="import-preview" id="import-preview" hidden></div>
+        <fieldset class="field import-mode" id="import-mode-fieldset">
+          <legend class="field-label">IMPORT MODE</legend>
+          <label class="radio-row">
+            <input type="radio" name="import-mode" value="merge" checked />
+            <span>MERGE — keep existing tabs, skip duplicates</span>
+          </label>
+          <label class="radio-row">
+            <input type="radio" name="import-mode" value="replace" />
+            <span>REPLACE — delete the current vault, then import</span>
+          </label>
+        </fieldset>
+        <label class="checkbox-row" id="import-confirm-replace" hidden>
+          <input type="checkbox" id="import-replace-check" />
+          <span>I understand this deletes the tabs currently in my vault.</span>
+        </label>
+        <p class="form-error" id="import-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button" data-close-dialog>CANCEL</button>
+          <button class="btn btn-primary" type="button" id="import-submit" disabled>&gt; IMPORT</button>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+      <span class="toast-text" id="toast-text"></span>
+      <button class="toast-action" type="button" id="toast-action" hidden>UNDO</button>
+    </div>
+
+    <script type="module" src="library.js"></script>
+  </body>
+</html>

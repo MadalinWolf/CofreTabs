@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="CofreTabs floppy disk logo">
+  <title>CofreTabs</title>
+  <rect width="512" height="512" rx="92" fill="#080B08"/>
+  <rect x="14" y="14" width="484" height="484" rx="80" fill="none" stroke="#14351E" stroke-width="3"/>
+
+  <!-- Floppy body with the classic cut corner -->
+  <path d="M112 68h264l64 64v312H76V92c0-13.3 10.7-24 24-24z" fill="#101610" stroke="#39FF72" stroke-width="13" stroke-linejoin="round"/>
+
+  <!-- Shutter -->
+  <path d="M312 84h92v76h-92z" fill="#070A07" stroke="#20C85A" stroke-width="7"/>
+  <path d="M336 84h30v76h-30z" fill="#1B2A1E"/>
+  <path d="M348 84v76" stroke="#39FF72" stroke-width="4" opacity="0.7"/>
+
+  <!-- Write-protect notch -->
+  <path d="M88 370h34v34H88z" fill="#070A07" stroke="#20C85A" stroke-width="5"/>
+
+  <!-- Label -->
+  <rect x="120" y="226" width="272" height="164" fill="#070A07" stroke="#20C85A" stroke-width="7"/>
+
+  <!-- Terminal prompt: >_ -->
+  <path d="M160 272l52 38-52 38" fill="none" stroke="#39FF72" stroke-width="21" stroke-linecap="square" stroke-linejoin="miter"/>
+  <rect x="240" y="338" width="112" height="21" fill="#39FF72"/>
+
+  <!-- Subtle phosphor dots -->
+  <circle cx="420" cy="420" r="4" fill="#39FF72" opacity="0.55"/>
+  <circle cx="404" cy="420" r="3" fill="#20C85A" opacity="0.5"/>
+  <circle cx="390" cy="420" r="2" fill="#20C85A" opacity="0.4"/>
+</svg>

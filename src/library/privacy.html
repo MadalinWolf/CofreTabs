@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>CofreTabs — Privacy Policy</title>
+    <meta name="description" content="CofreTabs privacy policy: local-only storage, no accounts, no cloud, no analytics." />
+    <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg" />
+    <link rel="stylesheet" href="../styles/library.css" />
+    <style>
+      /* This page is static documentation; styles stay inline because the
+         extension CSP allows styles but not inline scripts. */
+      .policy {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 42px 22px 64px;
+      }
+      .policy-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 24px;
+      }
+      .policy h1 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: 0.12em;
+        color: var(--green);
+      }
+      .policy h2 {
+        margin: 28px 0 8px;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--text);
+        text-transform: uppercase;
+      }
+      .policy h2::before {
+        content: "// ";
+        color: var(--green-2);
+        letter-spacing: 0;
+      }
+      .policy p,
+      .policy li {
+        font-size: 12px;
+        line-height: 1.75;
+        color: var(--text-dim);
+      }
+      .policy ul {
+        padding-left: 18px;
+      }
+      .policy code {
+        color: var(--green-2);
+        font-size: 11px;
+      }
+      .policy-meta {
+        font-size: 9.5px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+      .policy-nav {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 28px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+      .policy-nav a {
+        font-size: 10px;
+        letter-spacing: 0.1em;
+      }
+      .policy-box {
+        margin: 18px 0;
+        padding: 12px 14px;
+        border: 1px dashed var(--line-strong);
+        background: rgba(57, 255, 114, 0.035);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="policy">
+      <header class="policy-header">
+        <img src="../../assets/icons/logo.svg" width="46" height="46" alt="" />
+        <div>
+          <h1>COFRETABS PRIVACY POLICY</h1>
+          <p class="policy-meta">VERSION 1.0.0 · EFFECTIVE 23 OCTOBER 2026 · MAD WOLF STUDIOS</p>
+        </div>
+      </header>
+
+      <div class="policy-box">
+        <p>
+          <strong>The short version:</strong> CofreTabs saves tabs in your browser's local IndexedDB storage.
+          There is no server, no account, no analytics, no telemetry, and no cloud sync. Your saved URLs,
+          titles and notes are not transmitted anywhere by the extension.
+        </p>
+      </div>
+
+      <h2>1. What CofreTabs stores</h2>
+      <p>When you explicitly press <code>SAVE THIS TAB</code>, CofreTabs stores the following on your device:</p>
+      <ul>
+        <li>The page title and full URL you chose to save.</li>
+        <li>The page hostname and the automatically assigned website folder.</li>
+        <li>The time the tab was saved, and when it was last changed.</li>
+        <li>An inline favicon image only when the browser provides one as a local <code>data:</code> image.</li>
+        <li>A note and folder assignment if you edit a saved tab yourself.</li>
+        <li>A trash state if you move an entry to the trash.</li>
+      </ul>
+      <p>
+        Data is stored with the browser's IndexedDB facility inside your browser profile. It is not placed in a
+        folder you select, and its location is controlled by your browser. Uninstalling the extension or
+        clearing extension data may remove it. Export a backup if you want to keep a copy.
+      </p>
+
+      <h2>2. What CofreTabs does not do</h2>
+      <ul>
+        <li>No account, sign-in, email address or API key is required.</li>
+        <li>No analytics, telemetry, crash reporting, advertising or tracking pixels.</li>
+        <li>No remote AI or third-party service receives your data.</li>
+        <li>No browsing history, cookies, clipboard contents or form data are read.</li>
+        <li>No saved page, title, URL, note or backup is uploaded by the extension.</li>
+        <li>No remote scripts, fonts or stylesheets are loaded.</li>
+        <li>No saved text is executed as HTML or JavaScript.</li>
+      </ul>
+
+      <h2>3. Permissions and why they exist</h2>
+      <ul>
+        <li>
+          <code>activeTab</code> — grants temporary access to the tab you are on only after you click the
+          CofreTabs toolbar icon. It lets the panel read the current page's title, URL and (if available)
+          inline favicon, and lets CofreTabs open the panel there.
+        </li>
+        <li>
+          <code>scripting</code> — used to inject the CofreTabs panel into the current page when you ask for
+          it. The panel is not injected into pages automatically or on every page.
+        </li>
+      </ul>
+      <p>
+        CofreTabs does not request host permissions, background access to all websites, history, cookies,
+        downloads, clipboard or native messaging access.
+      </p>
+
+      <h2>4. Backups</h2>
+      <p>
+        Export creates a plain JSON file on your device using the browser's normal download behaviour. That
+        file is not encrypted. Store it somewhere you trust. Import reads a file you choose and processes it
+        locally; nothing is uploaded. CofreTabs never writes backups to a folder of its own choosing.
+      </p>
+
+      <h2>5. Favicons and network requests</h2>
+      <p>
+        To avoid leaking browsing activity, CofreTabs never fetches favicons from a website. It displays an
+        inline favicon only when the browser already provides one as a local data URL; otherwise it shows a
+        letter monogram. The extension performs no network requests at runtime.
+      </p>
+
+      <h2>6. Website folders and the Public Suffix List</h2>
+      <p>
+        Folder classification uses a bundled snapshot of the Public Suffix List (ICANN section), licensed
+        under the Mozilla Public License 2.0. It is data included in the package and is not downloaded at
+        runtime. Website names for common sites are a small built-in map.
+      </p>
+
+      <h2>7. Other software on your computer</h2>
+      <p>
+        Like any browser extension, CofreTabs runs inside your browser. Other extensions, browser sync
+        features, operating-system backups, or someone with access to your browser profile may be able to read
+        local extension data. CofreTabs cannot control those third parties. If you need stronger protection,
+        use a separate browser profile and full-disk encryption.
+      </p>
+
+      <h2>8. Data control and deletion</h2>
+      <ul>
+        <li>Move a tab to Trash to hide it from the active vault.</li>
+        <li>Delete forever or empty the Trash to remove entries from IndexedDB.</li>
+        <li>Export a backup before clearing browser data if you want to keep your library.</li>
+        <li>Uninstalling the extension removes its extension storage according to browser behaviour.</li>
+      </ul>
+
+      <h2>9. Children and sensitive data</h2>
+      <p>
+        CofreTabs is a general-purpose bookmarking utility. It is not designed for storing passwords, payment
+        card numbers, health records or other highly sensitive information. If you save a URL containing
+        secrets, those secrets become part of your local library and any backups you export.
+      </p>
+
+      <h2>10. Changes and contact</h2>
+      <p>
+        Material changes to this policy will be documented in the repository and in release notes. This
+        policy describes extension version 1.0.0. Questions and privacy reports can be raised through the
+        public GitHub issue tracker at
+        <a href="https://github.com/MadalinWolf" target="_blank" rel="noopener noreferrer">github.com/MadalinWolf</a>.
+        Do not include personal browsing data in a public issue.
+      </p>
+
+      <nav class="policy-nav" aria-label="Related links">
+        <a href="library.html">← BACK TO LIBRARY</a>
+        <a href="https://madwolfstudios.com/" target="_blank" rel="noopener noreferrer">MADWOLFSTUDIOS.COM ↗</a>
+        <a href="https://github.com/MadalinWolf" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
+      </nav>
+    </main>
+  </body>
+</html>

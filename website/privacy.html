@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy — CofreTabs</title>
+  <meta name="description" content="CofreTabs privacy policy. Local-only vault, no accounts, no analytics, no cloud.">
+  <meta name="theme-color" content="#080b08">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/icon128.png" width="32" height="32" alt="">
+        <span>COFRETABS</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#privacy">Privacy</a>
+        <a href="index.html#install">Install</a>
+        <a class="nav-github" href="https://github.com/MadalinWolf" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="section legal">
+      <div class="wrap legal-wrap">
+        <p class="section-kicker">// PRIVACY POLICY</p>
+        <h1>Your vault stays<br><span class="accent">on your device.</span></h1>
+        <p class="lede">Effective 2026-10-23 · CofreTabs 1.0.x · Mad Wolf Studios</p>
+
+        <p>CofreTabs is a local-only tab vault. It has no backend, no user accounts, no analytics and no cloud sync. Saved tabs, folders and notes live in IndexedDB inside your browser profile.</p>
+
+        <h2>1. What CofreTabs stores</h2>
+        <p>When you explicitly press <strong>SAVE THIS TAB</strong>, CofreTabs stores the page title, full URL, hostname, automatic folder, timestamps, an inline favicon only if the browser supplies a local <code>data:</code> image, any note or folder changes you make, and a trash state if you move the entry to Trash.</p>
+        <p>It does not store browsing history, open-tab lists, cookies, form data, clipboard contents or passwords. It does not read pages you have not chosen to save.</p>
+
+        <h2>2. What CofreTabs does not do</h2>
+        <ul class="checks">
+          <li>No account, sign-in, email address or API key</li>
+          <li>No analytics, telemetry, crash reporting, ads or tracking pixels</li>
+          <li>No remote scripts, fonts, styles or favicon requests</li>
+          <li>No upload of saved pages, titles, URLs, notes or backups</li>
+          <li>No reading of history, cookies or clipboard contents</li>
+          <li>No execution of saved text as HTML or JavaScript</li>
+        </ul>
+
+        <h2>3. Permissions</h2>
+        <p><code>activeTab</code> lets the extension read the current tab's title and URL only after you click the toolbar icon. <code>scripting</code> lets it inject the save panel after that same click. CofreTabs requests no host permissions and no always-on content scripts.</p>
+        <p>Browser-internal pages such as <code>chrome://</code>, the Chrome Web Store and PDF viewers cannot be injected by any extension. CofreTabs opens its library with an explanation instead; it does not try to bypass browser restrictions.</p>
+
+        <h2>4. Backups</h2>
+        <p>Exported backups are JSON files created locally and downloaded through your browser. Where they go is controlled by you. CofreTabs never uploads them. Backups contain URLs, titles and notes and are not encrypted — treat them as personal data.</p>
+
+        <h2>5. Favicons and network requests</h2>
+        <p>Only inline <code>data:image/*</code> favicons supplied by the browser are stored. CofreTabs does not fetch remote favicon URLs and makes no runtime network requests. Its stylesheet and Public Suffix List are bundled with the extension.</p>
+
+        <h2>6. Website folders</h2>
+        <p>Automatic folders are derived locally from a bundled snapshot of the ICANN section of the Public Suffix List. Hostnames are not sent to a lookup service. Private PSL rules are excluded, so shared platforms group by platform.</p>
+
+        <h2>7. Other software</h2>
+        <p>Your browser, operating system, backup software and any installed store may process browser-profile data under their own policies. CofreTabs does not control those products. A store may collect install/update telemetry independently of the extension.</p>
+
+        <h2>8. Your control</h2>
+        <p>Trash hides entries without deleting them. <strong>Delete forever</strong> and <strong>Empty Trash</strong> remove records from IndexedDB. Deleting a folder moves its active tabs to Trash. Export a backup before clearing browser data or uninstalling. Uninstalling or clearing extension data removes the local vault according to browser behaviour. There is no server-side copy to delete because none is ever created.</p>
+
+        <h2>9. Sensitive data</h2>
+        <p>Do not use CofreTabs as a password manager, health record store or other sensitive-data vault. Saved URLs, titles and notes are stored unencrypted in your browser profile. Use full-disk encryption and OS account security.</p>
+
+        <h2>10. Changes and contact</h2>
+        <p>Material changes will be documented in the changelog and release notes, and the effective date will be updated. Questions: <a href="https://madwolfstudios.com/" rel="noopener">madwolfstudios.com</a>.</p>
+
+        <p class="faint">CofreTabs is open source under the MIT license. Verify these claims in the source: no remote <code>fetch</code> in <code>src/</code>, two permissions in <code>manifest.json</code>, and a single database layer in <code>src/storage/vault.js</code>.</p>
+
+        <p><a class="text-link" href="index.html">← Back to CofreTabs</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-bottom">
+      <p><span class="dim">madwolf@studio:~$</span> echo "your tabs. your vault. your device." <span class="cursor">_</span></p>
+    </div>
+  </footer>
+</body>
+</html>
