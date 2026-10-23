@@ -345,7 +345,7 @@ Third-party notices: [`docs/THIRD-PARTY.md`](docs/THIRD-PARTY.md).
 ---
 
 ```console
-┌─[ MAD WOLF STUDIOS ]────────────────────────────────────────────┐
+┌─[ MADWOLF STUDIOS ]──────────────────────────────────────────────┐
 │                                                                  │
 │   Thanks for using CofreTabs.                                    │
 │                                                                  │
