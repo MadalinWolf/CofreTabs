@@ -345,18 +345,18 @@ Third-party notices: [`docs/THIRD-PARTY.md`](docs/THIRD-PARTY.md).
 ---
 
 ```console
-┌─[ MADWOLF STUDIOS ]──────────────────────────────────────────────┐
-│                                                                  │
-│   Thanks for using CofreTabs.                                    │
-│                                                                  │
-│   If this saved your tab sanity:                                 │
-│     ★ star the repository      → github.com/MadalinWolf          │
-│     → follow the studio        → github.com/MadalinWolf          │
-│     ♥ donate                   → TODO: ADD DONATION LINK         │
-│                                                                  │
-│   More experiments: https://madwolfstudios.com/                  │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+┌─[ MADWOLF STUDIOS ]─────────────────────────────────────────────┐
+│                                                                 │
+│   Thanks for using CofreTabs.                                   │
+│                                                                 │
+│   If this saved your tab sanity:                                │
+│     ★ star the repository → github.com/MadalinWolf/CofreTabs    │
+│     → follow the studio    → github.com/MadalinWolf             │
+│     ♥ donate               → github.com/sponsors/MadalinWolf    │
+│                                                                 │
+│   More experiments: https://madwolfstudios.com/                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 The donation line is intentionally marked `TODO: ADD DONATION LINK`. No payment
