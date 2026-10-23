@@ -254,7 +254,8 @@ truthful success/failure states, and accessible panel close handling.
 
 A manual browser pass is still required for things jsdom cannot verify: real
 toolbar injection, browser storage quotas, downloads and visual rendering. Use
-[`docs/QA-CHECKLIST.md`](docs/QA-CHECKLIST.md).
+[`docs/QA-CHECKLIST.md`](docs/QA-CHECKLIST.md). The GitHub Actions workflow in
+`.github/workflows/ci.yml` runs the tests, build and package on every push.
 
 ### Build integrity checks
 

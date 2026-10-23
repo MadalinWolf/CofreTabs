@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install development dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: node --test
+
+      - name: Build extension
+        run: node scripts/build.mjs
+
+      - name: Package release ZIP
+        run: node scripts/package.mjs
+
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: cofretabs-release
+          path: release/
+          if-no-files-found: error
+          retention-days: 14
