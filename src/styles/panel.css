@@ -26,6 +26,19 @@
   --ct-bg: #080b08;
   --ct-bg-2: #101610;
   --ct-bg-3: #0b120c;
+  --ct-bg-deep: #0b100b;
+  --ct-bg-edge: #060906;
+  --ct-glow: rgba(57, 255, 114, 0.07);
+  --ct-scanline: rgba(57, 255, 114, 0.035);
+  --ct-card-bg: rgba(16, 22, 16, 0.95);
+  --ct-card-bg-2: rgba(8, 11, 8, 0.95);
+  --ct-tile-bg: rgba(16, 22, 16, 0.8);
+  --ct-tile-bg-soft: rgba(16, 22, 16, 0.35);
+  --ct-footer-bg: rgba(3, 6, 3, 0.7);
+  --ct-inset-bg: #040604;
+  --ct-terminal-bg: rgba(2, 5, 2, 0.72);
+  --ct-fav: #ffd166;
+  --ct-shadow: -28px 0 70px rgba(0, 0, 0, 0.6);
   --ct-green: #39ff72;
   --ct-green-2: #20c85a;
   --ct-muted: #729b7c;
@@ -49,11 +62,40 @@
   line-height: 1.5;
   color: var(--ct-text);
   background:
-    radial-gradient(120% 70% at 100% 0%, rgba(57, 255, 114, 0.07), transparent 55%),
-    linear-gradient(180deg, #0b100b 0%, var(--ct-bg) 55%, #060906 100%);
+    radial-gradient(120% 70% at 100% 0%, var(--ct-glow), transparent 55%),
+    linear-gradient(180deg, var(--ct-bg-deep) 0%, var(--ct-bg) 55%, var(--ct-bg-edge) 100%);
   border-left: 1px solid var(--ct-line-strong);
-  box-shadow: -28px 0 70px rgba(0, 0, 0, 0.6), inset 1px 0 0 rgba(57, 255, 114, 0.08);
+  box-shadow: var(--ct-shadow), inset 1px 0 0 var(--ct-glow);
   animation: ct-slide-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Light theme: same retro structure, paper-bright surfaces and deep green ink. */
+.ct-panel[data-theme='light'] {
+  color-scheme: light;
+  --ct-bg: #f5f8f2;
+  --ct-bg-2: #edf2e8;
+  --ct-bg-3: #e7ede1;
+  --ct-bg-deep: #f2f5ef;
+  --ct-bg-edge: #e6ece1;
+  --ct-glow: rgba(11, 122, 55, 0.07);
+  --ct-scanline: rgba(11, 122, 55, 0.05);
+  --ct-card-bg: rgba(255, 255, 255, 0.9);
+  --ct-card-bg-2: rgba(240, 245, 236, 0.9);
+  --ct-tile-bg: rgba(255, 255, 255, 0.85);
+  --ct-tile-bg-soft: rgba(233, 240, 228, 0.7);
+  --ct-footer-bg: rgba(232, 238, 227, 0.85);
+  --ct-inset-bg: #eef2ea;
+  --ct-terminal-bg: rgba(233, 240, 227, 0.75);
+  --ct-fav: #9a6400;
+  --ct-shadow: -24px 0 60px rgba(24, 48, 30, 0.22);
+  --ct-green: #0b7a37;
+  --ct-green-2: #0e6b32;
+  --ct-muted: #4e6355;
+  --ct-text: #14211a;
+  --ct-warn: #8a5a00;
+  --ct-error: #c0392b;
+  --ct-line: rgba(11, 122, 55, 0.28);
+  --ct-line-strong: rgba(11, 122, 55, 0.52);
 }
 
 .ct-panel::before {
@@ -64,8 +106,8 @@
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(57, 255, 114, 0.035) 0,
-    rgba(57, 255, 114, 0.035) 1px,
+    var(--ct-scanline) 0,
+    var(--ct-scanline) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -213,7 +255,7 @@
   align-items: flex-start;
   gap: 10px;
   padding: 11px;
-  background: linear-gradient(180deg, rgba(16, 22, 16, 0.95), rgba(8, 11, 8, 0.95));
+  background: linear-gradient(180deg, var(--ct-card-bg), var(--ct-card-bg-2));
   border: 1px solid var(--ct-line);
   border-left: 2px solid var(--ct-green-2);
   border-radius: 2px;
@@ -226,7 +268,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #040604;
+  background: var(--ct-inset-bg);
   border: 1px solid var(--ct-line);
   border-radius: 2px;
 }
@@ -351,7 +393,7 @@
   font-size: 10.5px;
   line-height: 1.65;
   color: var(--ct-green-2);
-  background: rgba(2, 5, 2, 0.72);
+  background: var(--ct-terminal-bg);
   border-left: 2px solid rgba(57, 255, 114, 0.3);
   scrollbar-width: thin;
   scrollbar-color: rgba(57, 255, 114, 0.25) transparent;
@@ -392,7 +434,7 @@
   gap: 5px;
   padding: 9px 10px;
   border: 1px dashed var(--ct-line-strong);
-  background: rgba(57, 255, 114, 0.035);
+  background: var(--ct-glow);
   border-radius: 2px;
 }
 
@@ -501,41 +543,128 @@
 
 .ct-folders {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.ct-chip {
-  display: inline-flex;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
-  max-width: 100%;
-  padding: 3px 6px;
-  font-size: 10px;
-  color: var(--ct-muted);
-  background: rgba(16, 22, 16, 0.8);
-  border: 1px solid var(--ct-line);
-  border-radius: 2px;
-  cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
 }
 
-.ct-chip:hover {
+/* Compact folder grid: 3 columns x 3 rows, advancing one row at a time. */
+.ct-folder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ct-folder-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+  min-height: 62px;
+  padding: 8px 8px 7px;
+  text-align: left;
+  color: var(--ct-text);
+  background: var(--ct-tile-bg);
+  border: 1px solid var(--ct-line);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease, transform 120ms ease;
+  animation: ct-tile-in 160ms ease-out both;
+}
+
+.ct-folder-tile:hover {
   color: var(--ct-green);
   border-color: var(--ct-line-strong);
   background: rgba(57, 255, 114, 0.07);
 }
 
-.ct-chip-name {
-  max-width: 140px;
+.ct-folder-tile:active {
+  transform: translateY(1px);
+}
+
+.ct-folder-tile-icon {
+  display: flex;
+  align-items: center;
+  height: 16px;
+  color: var(--ct-green-2);
+}
+
+.ct-folder-icon-favorites {
+  color: var(--ct-fav);
+}
+
+.ct-folder-glyph {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--ct-green-2);
+  white-space: nowrap;
+}
+
+.ct-folder-tile-name {
+  display: block;
+  max-width: 100%;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ct-chip-count {
-  color: var(--ct-green-2);
+.ct-folder-tile-count {
+  font-size: 9px;
+  color: var(--ct-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.ct-folder-tile-empty {
+  min-height: 62px;
+  background: transparent;
+  border: 1px dashed var(--ct-line);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.ct-folder-nav {
+  display: grid;
+  grid-template-columns: 26px 1fr 26px;
+  align-items: center;
+  gap: 6px;
+}
+
+.ct-folder-nav-btn {
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ct-muted);
+  background: transparent;
+  border: 1px solid var(--ct-line);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.ct-folder-nav-btn:hover {
+  color: var(--ct-green);
+  border-color: var(--ct-line-strong);
+  background: rgba(57, 255, 114, 0.07);
+}
+
+.ct-folder-nav-gap {
+  height: 20px;
+}
+
+.ct-folder-position {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--ct-muted);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 
 .ct-results {
@@ -613,6 +742,36 @@
   opacity: 1;
 }
 
+.ct-item-fav {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--ct-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: color 120ms ease, border-color 120ms ease, opacity 120ms ease;
+}
+
+.ct-item-fav:hover {
+  color: var(--ct-fav);
+  border-color: var(--ct-line);
+  opacity: 1;
+}
+
+.ct-item-fav.is-active {
+  color: var(--ct-fav);
+  opacity: 1;
+}
+
 .ct-hint {
   font-size: 10px;
   color: var(--ct-muted);
@@ -623,7 +782,7 @@
   padding: 16px 12px;
   text-align: center;
   border: 1px dashed var(--ct-line);
-  background: rgba(16, 22, 16, 0.35);
+  background: var(--ct-tile-bg-soft);
 }
 
 .ct-empty-title {
@@ -656,7 +815,7 @@
   font-size: 8.5px;
   letter-spacing: 0.12em;
   color: var(--ct-muted);
-  background: rgba(3, 6, 3, 0.7);
+  background: var(--ct-footer-bg);
 }
 
 /* ------------------------------------------------------------- animations */
@@ -684,6 +843,17 @@
 }
 
 @keyframes ct-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ct-tile-in {
   from {
     opacity: 0;
     transform: translateY(2px);
@@ -754,12 +924,14 @@
   .ct-panel,
   .ct-closing,
   .ct-line,
+  .ct-folder-tile,
   .ct-save-cursor {
     animation: none !important;
     transition: none !important;
   }
 
-  .ct-save-btn:active:not(:disabled) {
+  .ct-save-btn:active:not(:disabled),
+  .ct-folder-tile:active {
     transform: none;
   }
 }
@@ -770,7 +942,8 @@
   .ct-save-btn,
   .ct-search,
   .ct-existing,
-  .ct-chip,
+  .ct-folder-tile,
+  .ct-folder-nav-btn,
   .ct-close,
   .ct-terminal,
   .ct-empty {
@@ -779,9 +952,11 @@
 
   .ct-save-btn,
   .ct-close,
-  .ct-chip,
+  .ct-folder-tile,
+  .ct-folder-nav-btn,
   .ct-link,
   .ct-item-main,
+  .ct-item-fav,
   .ct-item-del {
     forced-color-adjust: none;
     color: ButtonText;

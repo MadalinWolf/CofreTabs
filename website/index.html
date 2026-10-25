@@ -36,14 +36,14 @@
       <div class="wrap hero-grid">
         <div class="hero-copy">
           <p class="prompt" aria-hidden="true">madwolf@studio:~$ <span class="cursor">_</span></p>
-          <p class="eyebrow">LOCAL-ONLY TAB VAULT // V1.0.0</p>
+          <p class="eyebrow">LOCAL-ONLY TAB VAULT // V1.1.0</p>
           <h1>Your tabs.<br>Your vault.<br><span class="accent">Your device.</span></h1>
           <p class="lede">CofreTabs turns the tab you are reading into a permanent, searchable entry in a private vault. No account. No sync. No cloud. Just the pages you chose to keep, on the machine you chose to keep them on.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#install">Install from source</a>
-            <a class="button" href="https://github.com/MadalinWolf" rel="noopener">View on GitHub</a>
+            <a class="button button-primary" href="https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0" rel="noopener">Download v1.1.0</a>
+            <a class="button" href="#install">Install from source</a>
           </div>
-          <p class="status-line"><span class="dot" aria-hidden="true"></span> Status: release candidate. Not yet on the Chrome Web Store.</p>
+          <p class="status-line"><span class="dot" aria-hidden="true"></span> Status: v1.1.0 published on GitHub Releases. Not on the Chrome Web Store.</p>
         </div>
 
         <div class="terminal-card" aria-label="CofreTabs panel preview">
@@ -188,23 +188,22 @@
         <div>
           <p class="section-kicker">// 04 — INSTALL</p>
           <h2>Load it yourself.</h2>
-          <p class="section-lede">There is no store listing yet. The honest install path today is an unpacked developer build. The repository URL below is the intended location; it is not public until the owner publishes it.</p>
+          <p class="section-lede">There is no store listing yet. The install path today is an unpacked build — either grab the zip from the GitHub Release or build from source.</p>
           <ol class="install-steps">
-            <li>Clone or download the repository.</li>
-            <li>Run <code>npm install</code> then <code>npm run build</code>.</li>
+            <li>Download <code>CofreTabs-v1.1.0.zip</code> from the <a href="https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0" rel="noopener">v1.1.0 release</a> and extract it (or clone the repo and run <code>npm install</code> + <code>npm run build</code>).</li>
             <li>Open <code>chrome://extensions</code>.</li>
             <li>Enable <strong>Developer mode</strong>.</li>
-            <li>Choose <strong>Load unpacked</strong> and select <code>dist/</code>.</li>
+            <li>Choose <strong>Load unpacked</strong> and select the extracted <code>CofreTabs-v1.1.0/</code> folder (or <code>dist/</code> from a source build).</li>
           </ol>
-          <p class="faint">Chrome 102+, Edge, Brave, Vivaldi or Opera. Only http(s) pages can be saved.</p>
+          <p class="faint">Chrome 109+, Edge, Brave, Vivaldi or Opera. Only http(s) pages can be saved.</p>
         </div>
         <div class="code-card">
-          <div class="code-card-head">terminal // after repository publication</div>
+          <div class="code-card-head">terminal // building from source</div>
           <pre><code><span class="dim">$</span> git clone https://github.com/MadalinWolf/CofreTabs.git
 <span class="dim">$</span> cd CofreTabs
 <span class="dim">$</span> npm install
 <span class="dim">$</span> npm run build
-<span class="accent">Built CofreTabs v1.0.0 → dist/</span></code></pre>
+<span class="accent">Built CofreTabs v1.1.0 → dist/</span></code></pre>
         </div>
       </div>
     </section>
@@ -212,11 +211,12 @@
     <section class="section status-section">
       <div class="wrap">
         <p class="section-kicker">// 05 — RELEASE STATUS</p>
-        <h2>Published? Not yet.</h2>
-        <p class="section-lede">This site is a prepared static package, not a live storefront. The project owner still needs to publish the GitHub repository, submit the extension and deploy this page. No download button here pretends otherwise.</p>
+        <h2>v1.1.0 is live on GitHub.</h2>
+        <p class="section-lede">CofreTabs v1.1.0 is published as a versioned GitHub Release with a checksummed zip. Install by downloading the release package and loading it unpacked. The Chrome Web Store submission is still pending, and this site remains a static package the owner can deploy to madwolfstudios.com.</p>
         <dl class="status-table">
-          <div><dt>Source + tests</dt><dd class="ok">Complete locally</dd></div>
-          <div><dt>GitHub repository</dt><dd class="warn">Not published</dd></div>
+          <div><dt>Source + tests</dt><dd class="ok">98/98 passing</dd></div>
+          <div><dt>GitHub release</dt><dd class="ok"><a href="https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0" rel="noopener">v1.1.0 published</a></dd></div>
+          <div><dt>Package</dt><dd class="ok">CofreTabs-v1.1.0.zip (sha256 recorded)</dd></div>
           <div><dt>Chrome Web Store</dt><dd class="warn">Not submitted</dd></div>
           <div><dt>Website</dt><dd class="warn">Not deployed</dd></div>
           <div><dt>Donation link</dt><dd class="warn">TODO: ADD DONATION LINK</dd></div>
@@ -234,7 +234,7 @@
       </div>
       <div>
         <p class="footer-head">Project</p>
-        <a href="https://github.com/MadalinWolf" rel="noopener">GitHub</a>
+        <a href="https://github.com/MadalinWolf/CofreTabs" rel="noopener">GitHub</a>
         <a href="https://madwolfstudios.com/" rel="noopener">Mad Wolf Studios</a>
         <a href="privacy.html">Privacy</a>
       </div>

@@ -296,8 +296,10 @@ test('filters the vault locally and opens a folder in the library', async () => 
   const panel = createPanel({ initData: baseInit(), searchResults });
 
   await waitFor(() => panel.shadow?.querySelector('.ct-search-input'));
-  assert.equal(panel.shadow.querySelectorAll('.ct-chip').length, 2);
-  panel.shadow.querySelector('.ct-chip').click();
+  const tiles = panel.shadow.querySelectorAll('.ct-folder-tile[data-action="open-folder"]');
+  assert.equal(tiles.length, 2);
+  assert.equal(tiles[0].getAttribute('data-folder-id'), 'folder-yt');
+  tiles[0].click();
   const folderCall = panel.calls.find((call) => call.type === 'cofre:open-library' && call.payload?.folderId);
   assert.equal(folderCall?.payload.folderId, 'folder-yt');
 

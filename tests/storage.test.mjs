@@ -34,6 +34,7 @@ test('initialises the database schema', async () => {
     trashed: 0,
     total: 0,
     folders: 0,
+    favorites: 0,
     activeFolders: 0,
     newestAt: null,
     oldestAt: null,
@@ -61,9 +62,13 @@ test('saves a tab, creates a website folder and reads it back', async () => {
   assert.equal(found.id, result.entry.id);
 
   const folders = await vault.listFolders();
-  assert.equal(folders.length, 1);
-  assert.equal(folders[0].name, 'YouTube');
-  assert.equal(folders[0].count, 1);
+  // The virtual Favorites collection is prepended, then the website folder.
+  assert.equal(folders.length, 2);
+  assert.equal(folders[0].id, '__favorites__');
+  assert.equal(folders[0].type, 'favorites');
+  assert.equal(folders[0].count, 0);
+  assert.equal(folders[1].name, 'YouTube');
+  assert.equal(folders[1].count, 1);
 
   await vault.close();
 });

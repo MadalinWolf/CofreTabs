@@ -1,6 +1,10 @@
 /*
  * CofreTabs library — retro terminal utility, built for readability.
  * No external fonts, images or stylesheets: everything is local.
+ *
+ * Theming: dark is the default. `data-theme="light"` on <html> swaps the
+ * palette via the variables below; every rule references variables so both
+ * themes stay consistent and readable.
  */
 
 :root {
@@ -14,12 +18,118 @@
   --text-dim: #a9c9b1;
   --warn: #ffd166;
   --error: #ff6262;
+  --error-text: #ffd4d4;
+  --fav: #ffd166;
   --line: rgba(57, 255, 114, 0.18);
   --line-strong: rgba(57, 255, 114, 0.42);
   --font: "Cascadia Mono", "JetBrains Mono", "IBM Plex Mono", "SFMono-Regular", Consolas,
     "Liberation Mono", Menlo, monospace;
   --radius: 3px;
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+
+  /* Surfaces */
+  --surface-body-a: #090d09;
+  --surface-body-b: var(--bg);
+  --surface-body-c: #060806;
+  --glow-a: rgba(57, 255, 114, 0.055);
+  --glow-b: rgba(57, 255, 114, 0.035);
+  --scanline: rgba(57, 255, 114, 0.022);
+  --selection-bg: rgba(57, 255, 114, 0.28);
+  --selection-text: #f2fff5;
+  --scrollbar: rgba(57, 255, 114, 0.2);
+  --sidebar-bg: linear-gradient(180deg, rgba(13, 18, 13, 0.96), rgba(7, 10, 7, 0.98));
+  --topbar-bg: rgba(8, 11, 8, 0.93);
+  --inset-bg: #040604;
+  --input-bg: #060906;
+  --readonly-bg: rgba(0, 0, 0, 0.3);
+  --card-bg: linear-gradient(180deg, rgba(16, 22, 16, 0.85), rgba(9, 13, 9, 0.85));
+  --empty-bg: rgba(16, 22, 16, 0.25);
+  --dialog-bg: linear-gradient(180deg, #0e150e, #080c08);
+  --dialog-backdrop: rgba(2, 4, 2, 0.78);
+  --toast-bg: #0a120b;
+  --preview-bg: rgba(57, 255, 114, 0.04);
+
+  /* Accent tints (hover / active / faint surfaces) */
+  --tint-hover: rgba(57, 255, 114, 0.045);
+  --tint-active: rgba(57, 255, 114, 0.075);
+  --tint-faint: rgba(57, 255, 114, 0.028);
+  --tint-row: rgba(57, 255, 114, 0.035);
+  --folder-tag-bg: rgba(57, 255, 114, 0.05);
+  --note-border: rgba(57, 255, 114, 0.3);
+  --btn-bg: rgba(16, 22, 16, 0.7);
+  --btn-primary-bg: rgba(57, 255, 114, 0.09);
+  --btn-primary-hover-bg: rgba(57, 255, 114, 0.16);
+  --btn-primary-glow: rgba(57, 255, 114, 0.16);
+  --danger-bg: rgba(255, 98, 98, 0.05);
+  --danger-hover-bg: rgba(255, 98, 98, 0.12);
+  --danger-border: rgba(255, 98, 98, 0.45);
+  --danger-text-hover: #ffdada;
+  --error-bg: rgba(255, 98, 98, 0.08);
+  --warn-bg: rgba(255, 209, 102, 0.045);
+  --warn-border: rgba(255, 209, 102, 0.35);
+  --info-bg: rgba(57, 255, 114, 0.05);
+  --info-border: rgba(57, 255, 114, 0.35);
+}
+
+/* Light theme: paper-bright surfaces, deep green ink. */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f8f2;
+  --bg-2: #edf2e8;
+  --bg-3: #e7ede1;
+  --green: #0b7a37;
+  --green-2: #0e6b32;
+  --muted: #4e6355;
+  --text: #14211a;
+  --text-dim: #33463a;
+  --warn: #8a5a00;
+  --error: #c0392b;
+  --error-text: #7d241a;
+  --fav: #9a6400;
+  --line: rgba(11, 122, 55, 0.28);
+  --line-strong: rgba(11, 122, 55, 0.52);
+  --shadow: 0 18px 50px rgba(24, 48, 30, 0.22);
+
+  --surface-body-a: #f2f5ef;
+  --surface-body-b: var(--bg);
+  --surface-body-c: #e9efe4;
+  --glow-a: rgba(11, 122, 55, 0.06);
+  --glow-b: rgba(11, 122, 55, 0.04);
+  --scanline: rgba(11, 122, 55, 0.04);
+  --selection-bg: rgba(11, 122, 55, 0.22);
+  --selection-text: #0a1b10;
+  --scrollbar: rgba(11, 122, 55, 0.28);
+  --sidebar-bg: linear-gradient(180deg, rgba(237, 242, 232, 0.97), rgba(231, 237, 225, 0.98));
+  --topbar-bg: rgba(245, 248, 242, 0.93);
+  --inset-bg: #eef2ea;
+  --input-bg: #fbfdf9;
+  --readonly-bg: rgba(11, 122, 55, 0.06);
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 245, 236, 0.9));
+  --empty-bg: rgba(233, 240, 228, 0.6);
+  --dialog-bg: linear-gradient(180deg, #fbfdf9, #eef2ea);
+  --dialog-backdrop: rgba(20, 40, 26, 0.42);
+  --toast-bg: #eef4ea;
+  --preview-bg: rgba(11, 122, 55, 0.06);
+
+  --tint-hover: rgba(11, 122, 55, 0.08);
+  --tint-active: rgba(11, 122, 55, 0.13);
+  --tint-faint: rgba(11, 122, 55, 0.05);
+  --tint-row: rgba(11, 122, 55, 0.05);
+  --folder-tag-bg: rgba(11, 122, 55, 0.08);
+  --note-border: rgba(11, 122, 55, 0.4);
+  --btn-bg: rgba(255, 255, 255, 0.75);
+  --btn-primary-bg: rgba(11, 122, 55, 0.1);
+  --btn-primary-hover-bg: rgba(11, 122, 55, 0.18);
+  --btn-primary-glow: rgba(11, 122, 55, 0.14);
+  --danger-bg: rgba(192, 57, 43, 0.06);
+  --danger-hover-bg: rgba(192, 57, 43, 0.13);
+  --danger-border: rgba(192, 57, 43, 0.45);
+  --danger-text-hover: #6d1f16;
+  --error-bg: rgba(192, 57, 43, 0.08);
+  --warn-bg: rgba(138, 90, 0, 0.07);
+  --warn-border: rgba(138, 90, 0, 0.4);
+  --info-bg: rgba(11, 122, 55, 0.07);
+  --info-border: rgba(11, 122, 55, 0.4);
 }
 
 *,
@@ -40,9 +150,9 @@ body {
   line-height: 1.5;
   color: var(--text);
   background:
-    radial-gradient(90% 60% at 100% 0%, rgba(57, 255, 114, 0.055), transparent 60%),
-    radial-gradient(70% 50% at 0% 100%, rgba(57, 255, 114, 0.035), transparent 60%),
-    linear-gradient(180deg, #090d09 0%, var(--bg) 48%, #060806 100%);
+    radial-gradient(90% 60% at 100% 0%, var(--glow-a), transparent 60%),
+    radial-gradient(70% 50% at 0% 100%, var(--glow-b), transparent 60%),
+    linear-gradient(180deg, var(--surface-body-a) 0%, var(--surface-body-b) 48%, var(--surface-body-c) 100%);
   background-attachment: fixed;
 }
 
@@ -54,8 +164,8 @@ body::after {
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(57, 255, 114, 0.022) 0,
-    rgba(57, 255, 114, 0.022) 1px,
+    var(--scanline) 0,
+    var(--scanline) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -90,8 +200,8 @@ button {
 }
 
 ::selection {
-  background: rgba(57, 255, 114, 0.28);
-  color: #f2fff5;
+  background: var(--selection-bg);
+  color: var(--selection-text);
 }
 
 ::-webkit-scrollbar {
@@ -104,7 +214,7 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(57, 255, 114, 0.2);
+  background: var(--scrollbar);
   border-radius: 10px;
   border: 2px solid var(--bg);
 }
@@ -147,7 +257,7 @@ button {
   gap: 18px;
   overflow-y: auto;
   padding: 20px 16px 14px;
-  background: linear-gradient(180deg, rgba(13, 18, 13, 0.96), rgba(7, 10, 7, 0.98));
+  background: var(--sidebar-bg);
   border-right: 1px solid var(--line);
   box-shadow: 12px 0 40px rgba(0, 0, 0, 0.22);
 }
@@ -165,6 +275,10 @@ button {
   filter: drop-shadow(0 0 10px rgba(57, 255, 114, 0.28));
 }
 
+:root[data-theme='light'] .brand-logo {
+  filter: none;
+}
+
 .brand-text {
   min-width: 0;
   display: flex;
@@ -177,6 +291,10 @@ button {
   font-weight: 700;
   letter-spacing: 0.17em;
   color: var(--green);
+}
+
+:root[data-theme='dark'] .brand-name,
+:root:not([data-theme]) .brand-name {
   text-shadow: 0 0 14px rgba(57, 255, 114, 0.3);
 }
 
@@ -215,13 +333,17 @@ button {
 
 .nav-item:hover {
   color: var(--green);
-  background: rgba(57, 255, 114, 0.045);
+  background: var(--tint-hover);
 }
 
 .nav-item[aria-current="page"] {
   color: var(--green);
-  background: rgba(57, 255, 114, 0.075);
+  background: var(--tint-active);
   border-left-color: var(--green);
+}
+
+:root[data-theme='dark'] .nav-item[aria-current="page"],
+:root:not([data-theme]) .nav-item[aria-current="page"] {
   text-shadow: 0 0 10px rgba(57, 255, 114, 0.24);
 }
 
@@ -284,6 +406,28 @@ button {
   color: var(--muted);
 }
 
+.side-new-folder {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.side-new-folder:hover {
+  color: var(--green);
+  border-color: var(--line-strong);
+  background: var(--tint-hover);
+}
+
 .folder-list {
   display: flex;
   flex-direction: column;
@@ -310,13 +454,17 @@ button {
 
 .folder-link:hover {
   color: var(--green);
-  background: rgba(57, 255, 114, 0.05);
+  background: var(--tint-hover);
 }
 
 .folder-link[data-active="true"] {
   color: var(--green);
   border-color: var(--line);
-  background: rgba(57, 255, 114, 0.06);
+  background: var(--tint-faint);
+}
+
+.folder-link[data-favorites="true"] .folder-icon {
+  color: var(--fav);
 }
 
 .folder-link-name {
@@ -339,6 +487,26 @@ button {
   padding: 3px 2px;
 }
 
+/* Folder icons (shared by the sidebar list and the folder grid). */
+.folder-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-2);
+}
+
+.folder-icon-favorites {
+  color: var(--fav);
+}
+
+.folder-icon-glyph {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .data-section {
   gap: 6px;
 }
@@ -357,6 +525,43 @@ button {
 
 .side-link:hover {
   color: var(--green);
+}
+
+/* Theme selector */
+.theme-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.theme-label {
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.theme-select {
+  height: 26px;
+  padding: 0 6px;
+  font-size: 10.5px;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.theme-select:focus {
+  border-color: var(--green-2);
+  box-shadow: 0 0 0 1px var(--tint-faint);
+}
+
+.theme-select option {
+  background: var(--bg-3);
+  color: var(--text);
 }
 
 /* ------------------------------------------------------------------ footer */
@@ -420,7 +625,7 @@ button {
   flex-wrap: wrap;
   padding: 4px 0 16px;
   margin-bottom: 4px;
-  background: rgba(8, 11, 8, 0.93);
+  background: var(--topbar-bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -450,8 +655,12 @@ button {
   font-weight: 700;
   letter-spacing: 0.11em;
   color: var(--text);
-  text-shadow: 0 0 18px rgba(57, 255, 114, 0.14);
   overflow-wrap: anywhere;
+}
+
+:root[data-theme='dark'] .view-title,
+:root:not([data-theme]) .view-title {
+  text-shadow: 0 0 18px rgba(57, 255, 114, 0.14);
 }
 
 .top-actions {
@@ -479,7 +688,7 @@ button {
 
 .search-wrap:focus-within {
   border-color: var(--green-2);
-  box-shadow: 0 0 0 1px rgba(57, 255, 114, 0.13);
+  box-shadow: 0 0 0 1px var(--tint-faint);
 }
 
 .search-prompt {
@@ -555,7 +764,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--text-dim);
-  background: rgba(16, 22, 16, 0.7);
+  background: var(--btn-bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   cursor: pointer;
@@ -566,7 +775,7 @@ button {
 .btn:hover:not(:disabled) {
   color: var(--green);
   border-color: var(--line-strong);
-  background: rgba(57, 255, 114, 0.07);
+  background: var(--tint-hover);
 }
 
 .btn:disabled {
@@ -577,13 +786,17 @@ button {
 .btn-primary {
   color: var(--green);
   border-color: var(--green-2);
-  background: rgba(57, 255, 114, 0.09);
+  background: var(--btn-primary-bg);
+}
+
+:root[data-theme='dark'] .btn-primary,
+:root:not([data-theme]) .btn-primary {
   text-shadow: 0 0 10px rgba(57, 255, 114, 0.24);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: rgba(57, 255, 114, 0.16);
-  box-shadow: 0 0 18px rgba(57, 255, 114, 0.16);
+  background: var(--btn-primary-hover-bg);
+  box-shadow: 0 0 18px var(--btn-primary-glow);
 }
 
 .btn-ghost {
@@ -592,14 +805,54 @@ button {
 
 .btn-danger {
   color: var(--error);
-  border-color: rgba(255, 98, 98, 0.45);
-  background: rgba(255, 98, 98, 0.05);
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
 }
 
 .btn-danger:hover:not(:disabled) {
-  color: #ffdada;
+  color: var(--danger-text-hover);
   border-color: var(--error);
-  background: rgba(255, 98, 98, 0.12);
+  background: var(--danger-hover-bg);
+}
+
+/* Favorite (heart) toggle used on saved-tab rows. */
+.fav-btn {
+  color: var(--muted);
+  min-width: 30px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.fav-btn:hover:not(:disabled) {
+  color: var(--fav);
+  border-color: var(--line-strong);
+  background: var(--tint-hover);
+}
+
+.fav-btn.is-active {
+  color: var(--fav);
+  border-color: var(--line);
+  background: var(--tint-faint);
+}
+
+/* Inline folder selector that replaces the MOVE button. */
+.move-select {
+  align-self: center;
+  max-width: 160px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 10px;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid var(--green-2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.move-select option {
+  background: var(--bg-3);
+  color: var(--text);
 }
 
 /* ------------------------------------------------------------------ notice */
@@ -612,8 +865,8 @@ button {
   margin: 14px 0 0;
   padding: 10px 38px 10px 12px;
   color: var(--text-dim);
-  background: rgba(255, 209, 102, 0.045);
-  border: 1px solid rgba(255, 209, 102, 0.35);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
   border-left: 2px solid var(--warn);
   border-radius: 2px;
   font-size: 11.5px;
@@ -622,6 +875,13 @@ button {
 
 .notice[hidden] {
   display: none;
+}
+
+/* Update banner: informational, uses the accent instead of the warning tint. */
+.update-notice {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  border-left-color: var(--green);
 }
 
 .notice-text {
@@ -703,7 +963,7 @@ button {
 }
 
 .tab-row:hover {
-  background: rgba(57, 255, 114, 0.028);
+  background: var(--tint-faint);
 }
 
 .tab-favicon {
@@ -712,7 +972,7 @@ button {
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #040604;
+  background: var(--inset-bg);
   border: 1px solid var(--line);
   border-radius: 2px;
 }
@@ -728,6 +988,10 @@ button {
   font-weight: 700;
   color: var(--green);
   text-shadow: 0 0 10px rgba(57, 255, 114, 0.4);
+}
+
+:root[data-theme='light'] .tab-monogram {
+  text-shadow: none;
 }
 
 .tab-main {
@@ -783,7 +1047,7 @@ button {
   font-size: 9px;
   letter-spacing: 0.05em;
   color: var(--green-2);
-  background: rgba(57, 255, 114, 0.05);
+  background: var(--folder-tag-bg);
   border: 1px solid var(--line);
   border-radius: 2px;
   cursor: pointer;
@@ -803,7 +1067,7 @@ button {
 .tab-note {
   margin-top: 5px;
   padding-left: 8px;
-  border-left: 1px solid rgba(57, 255, 114, 0.3);
+  border-left: 1px solid var(--note-border);
   font-size: 11px;
   line-height: 1.5;
   color: var(--text-dim);
@@ -821,7 +1085,7 @@ button {
   gap: 5px;
   flex-wrap: wrap;
   justify-content: flex-end;
-  max-width: 190px;
+  max-width: 210px;
 }
 
 .tab-actions .btn {
@@ -843,7 +1107,7 @@ button {
 .folder-card {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(16, 22, 16, 0.85), rgba(9, 13, 9, 0.85));
+  background: var(--card-bg);
   border: 1px solid var(--line);
   border-radius: 2px;
   transition: border-color 140ms ease, box-shadow 140ms ease;
@@ -851,7 +1115,7 @@ button {
 
 .folder-card:hover {
   border-color: var(--line-strong);
-  box-shadow: 0 0 22px rgba(57, 255, 114, 0.06);
+  box-shadow: 0 0 22px var(--tint-row);
 }
 
 .folder-open {
@@ -873,6 +1137,9 @@ button {
 }
 
 .folder-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 10px;
   color: var(--green-2);
   letter-spacing: 0.1em;
@@ -928,9 +1195,14 @@ button {
   border-color: var(--line);
 }
 
+.folder-actions-note {
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
 .folder-actions button[data-action="delete-folder"]:hover {
   color: var(--error);
-  border-color: rgba(255, 98, 98, 0.35);
+  border-color: var(--danger-border);
 }
 
 /* ------------------------------------------------------------------- empty */
@@ -940,15 +1212,19 @@ button {
   padding: 44px 22px;
   text-align: center;
   border: 1px dashed var(--line);
-  background: rgba(16, 22, 16, 0.25);
+  background: var(--empty-bg);
 }
 
 .empty-mark {
   font-size: 24px;
   letter-spacing: 0.2em;
   color: var(--green);
-  text-shadow: 0 0 20px rgba(57, 255, 114, 0.3);
   margin-bottom: 12px;
+}
+
+:root[data-theme='dark'] .empty-mark,
+:root:not([data-theme]) .empty-mark {
+  text-shadow: 0 0 20px rgba(57, 255, 114, 0.3);
 }
 
 .empty h2 {
@@ -1029,7 +1305,7 @@ button {
   max-height: min(88vh, 780px);
   padding: 0;
   color: var(--text);
-  background: linear-gradient(180deg, #0e150e, #080c08);
+  background: var(--dialog-bg);
   border: 1px solid var(--line-strong);
   border-radius: 2px;
   box-shadow: var(--shadow);
@@ -1037,7 +1313,7 @@ button {
 }
 
 .dialog::backdrop {
-  background: rgba(2, 4, 2, 0.78);
+  background: var(--dialog-backdrop);
   backdrop-filter: blur(3px);
 }
 
@@ -1064,6 +1340,10 @@ button {
   font-size: 12px;
   letter-spacing: 0.16em;
   color: var(--green);
+}
+
+:root[data-theme='dark'] .dialog-head h2,
+:root:not([data-theme]) .dialog-head h2 {
   text-shadow: 0 0 12px rgba(57, 255, 114, 0.22);
 }
 
@@ -1126,7 +1406,7 @@ button {
   width: 100%;
   padding: 8px 9px;
   color: var(--text);
-  background: #060906;
+  background: var(--input-bg);
   border: 1px solid var(--line);
   border-radius: 2px;
   outline: none;
@@ -1137,7 +1417,7 @@ button {
 .field select:focus,
 .field textarea:focus {
   border-color: var(--green-2);
-  box-shadow: 0 0 0 1px rgba(57, 255, 114, 0.12);
+  box-shadow: 0 0 0 1px var(--tint-faint);
 }
 
 .field textarea {
@@ -1158,7 +1438,7 @@ button {
   font-family: inherit;
   font-size: 9.5px;
   color: var(--green);
-  background: rgba(57, 255, 114, 0.08);
+  background: var(--btn-primary-bg);
   border: 1px solid var(--line-strong);
   border-radius: 2px;
   cursor: pointer;
@@ -1168,7 +1448,7 @@ button {
   padding: 7px 9px;
   font-size: 10.5px;
   color: var(--muted);
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--readonly-bg);
   border: 1px dashed var(--line);
   border-radius: 2px;
   overflow-wrap: anywhere;
@@ -1179,8 +1459,8 @@ button {
   padding: 7px 9px;
   font-size: 10.5px;
   line-height: 1.5;
-  color: #ffd4d4;
-  background: rgba(255, 98, 98, 0.08);
+  color: var(--error-text);
+  background: var(--error-bg);
   border-left: 2px solid var(--error);
 }
 
@@ -1230,7 +1510,7 @@ button {
   font-size: 10.5px;
   line-height: 1.6;
   color: var(--text-dim);
-  background: rgba(57, 255, 114, 0.04);
+  background: var(--preview-bg);
   border: 1px dashed var(--line);
 }
 
@@ -1261,7 +1541,7 @@ button {
   font-size: 11px;
   line-height: 1.5;
   color: var(--text);
-  background: #0a120b;
+  background: var(--toast-bg);
   border: 1px solid var(--line-strong);
   border-left: 2px solid var(--green);
   border-radius: 2px;
@@ -1274,12 +1554,12 @@ button {
 }
 
 .toast.is-error {
-  border-color: rgba(255, 98, 98, 0.5);
+  border-color: var(--danger-border);
   border-left-color: var(--error);
 }
 
 .toast.is-error .toast-text {
-  color: #ffd4d4;
+  color: var(--error-text);
 }
 
 .toast-action {
@@ -1400,6 +1680,10 @@ button {
     grid-column: 1 / -1;
   }
 
+  .theme-field {
+    grid-column: 1 / -1;
+  }
+
   .side-footer {
     margin-top: 0;
   }
@@ -1486,7 +1770,9 @@ button {
   .sort-wrap,
   .notice,
   .toast,
-  .tab-favicon {
+  .tab-favicon,
+  .theme-select,
+  .move-select {
     border: 1px solid CanvasText;
   }
 

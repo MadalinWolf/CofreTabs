@@ -12,6 +12,7 @@ export const MSG = Object.freeze({
   SEARCH: 'cofre:search',
   TRASH_TAB: 'cofre:trash-tab',
   RESTORE_TAB: 'cofre:restore-tab',
+  TOGGLE_FAVORITE: 'cofre:toggle-favorite',
   OPEN_URL: 'cofre:open-url',
   OPEN_LIBRARY: 'cofre:open-library',
   REFRESH_BADGE: 'cofre:refresh-badge',

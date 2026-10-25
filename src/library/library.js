@@ -9,11 +9,20 @@ import { getVault } from '../storage/vault.js';
 import { normalizeBackupData } from '../lib/backup.js';
 import { compactUrl, parsePageUrl, safeHttpUrlForOpening } from '../lib/url.js';
 import { formatDateTime, formatNumber, monogram, plural, relativeTime, fileTimestamp } from '../lib/format.js';
+import {
+  FAVORITES_FOLDER_ID,
+  buildFolderIcon,
+  folderType,
+  isFavoritesFolder,
+} from '../lib/folders.js';
+import { applyTheme, normalizeTheme, persistTheme, readStoredTheme, resolveTheme, systemPrefersLight, toggleTheme } from '../lib/theme.js';
+import { checkForUpdate, readUpdateState, writeUpdateState } from '../lib/update-check.js';
 import { MSG } from '../lib/messages.js';
 
 const PAGE_SIZE = 200;
 const ALLOWED_VIEWS = new Set(['all', 'recent', 'folders', 'trash', 'folder']);
 const MAX_IMPORT_BYTES = 80 * 1024 * 1024;
+const THEME_META_KEY = 'theme';
 
 const vault = getVault();
 
@@ -28,6 +37,7 @@ const state = {
   stats: { active: 0, trashed: 0, folders: 0 },
   editingId: null,
   folderEditingId: null,
+  folderDialogMode: 'rename',
   importRaw: null,
   importParsed: null,
   loading: false,
@@ -38,7 +48,8 @@ const state = {
   searchTimer: 0,
   notice: null,
   prefill: null,
-  version: '1.0.0',
+  theme: 'dark',
+  version: '1.1.0',
 };
 
 const dom = {};
@@ -72,6 +83,10 @@ function cacheDom() {
     'notice-text',
     'notice-actions',
     'notice-close',
+    'update-banner',
+    'update-text',
+    'update-open',
+    'update-dismiss',
     'result-count',
     'content',
     'load-more-wrap',
@@ -81,6 +96,8 @@ function cacheDom() {
     'nav-count-trash',
     'folder-count',
     'folder-list',
+    'btn-new-folder',
+    'theme-select',
     'storage-line',
     'version-label',
     'btn-export',
@@ -102,6 +119,7 @@ function cacheDom() {
     'dialog-folder',
     'form-folder',
     'folder-name',
+    'folder-hint',
     'folder-error',
     'folder-submit',
     'dialog-confirm',
@@ -139,6 +157,7 @@ async function init() {
     /* version label keeps its default */
   }
 
+  initTheme();
   hydrateFromUrl();
   wireStaticEvents();
 
@@ -147,11 +166,84 @@ async function init() {
 
   try {
     await vault.init();
+    await syncThemeToVault();
     await load({ resetLimit: true });
   } catch (error) {
     renderFatal(error);
   }
   renderNotice();
+  void maybeShowUpdateBanner();
+}
+
+// -------------------------------------------------------------------- theme
+
+function initTheme() {
+  state.theme = resolveTheme(readStoredTheme(), systemPrefersLight());
+  applyTheme(state.theme);
+  if (dom.themeSelect) {
+    dom.themeSelect.value = state.theme;
+    dom.themeSelect.addEventListener('change', () => void setTheme(dom.themeSelect.value));
+  }
+}
+
+async function setTheme(theme) {
+  const value = applyTheme(theme);
+  state.theme = value;
+  persistTheme(value);
+  if (dom.themeSelect) dom.themeSelect.value = value;
+  try {
+    // Mirrored to the vault so the injected panel follows the same theme.
+    await vault.setMeta(THEME_META_KEY, value);
+  } catch {
+    /* the panel keeps its previous theme; nothing else is affected */
+  }
+}
+
+async function syncThemeToVault() {
+  try {
+    const stored = normalizeTheme(await vault.getMeta(THEME_META_KEY));
+    if (!stored) await vault.setMeta(THEME_META_KEY, state.theme);
+  } catch {
+    /* non-fatal */
+  }
+}
+
+// ------------------------------------------------------------------- updates
+
+/**
+ * Asks the official GitHub releases feed (at most once every 12 hours)
+ * whether a newer CofreTabs exists. Offline, rate-limited or malformed
+ * responses are silent no-ops: the banner only appears for a verified newer
+ * release, and installing it stays a manual, user-approved step on the
+ * official release page.
+ */
+async function maybeShowUpdateBanner() {
+  let result;
+  try {
+    result = await checkForUpdate({ currentVersion: state.version });
+  } catch {
+    return;
+  }
+  if (!result?.updateAvailable || !result.version) return;
+  showUpdateBanner(result);
+}
+
+function showUpdateBanner({ version, url }) {
+  dom.updateText.textContent =
+    `CofreTabs v${version} is available — you have v${state.version}. ` +
+    'Updates install from the official GitHub release page: download the release ZIP and load it unpacked.';
+  dom.updateOpen.href = url;
+  dom.updateBanner.hidden = false;
+  dom.updateBanner.dataset.version = version;
+}
+
+function dismissUpdateBanner() {
+  const version = dom.updateBanner?.dataset?.version || '';
+  dom.updateBanner.hidden = true;
+  if (version) {
+    const current = readUpdateState();
+    writeUpdateState({ ...current, dismissedVersion: version });
+  }
 }
 
 function hydrateFromUrl() {
@@ -213,9 +305,17 @@ function wireStaticEvents() {
   });
 
   dom.btnAdd.addEventListener('click', () => openAddDialog(state.prefill));
+  dom.btnNewFolder.addEventListener('click', () => openFolderCreate());
   dom.btnLoadMore.addEventListener('click', () => {
     state.limit += PAGE_SIZE;
     void load({ resetLimit: false });
+  });
+
+  dom.updateDismiss.addEventListener('click', () => dismissUpdateBanner());
+  dom.updateOpen.addEventListener('click', () => {
+    // Let the link navigate; the dismissal keeps the banner from returning
+    // for this same release.
+    dismissUpdateBanner();
   });
 
   dom.btnExport.addEventListener('click', () => void exportBackup());
@@ -416,7 +516,7 @@ function renderNav() {
   dom.navCountAll.textContent = formatNumber(state.stats.active);
   dom.navCountFolders.textContent = formatNumber(state.stats.folders);
   dom.navCountTrash.textContent = formatNumber(state.stats.trashed);
-  dom.folderCount.textContent = formatNumber(state.folders.length);
+  dom.folderCount.textContent = formatNumber(state.stats.folders);
 }
 
 function renderSidebarFolders() {
@@ -433,10 +533,12 @@ function renderSidebarFolders() {
       'data-folder-id': folder.id,
       title: `${folder.name} — ${folder.count} ${plural(folder.count, 'tab')}`,
     }, [
+      buildFolderIcon(folder, 13),
       h('span', { class: 'folder-link-name', text: folder.name }),
       h('span', { class: 'folder-link-count', text: formatNumber(folder.count) }),
     ]);
     if (active) button.setAttribute('data-active', 'true');
+    if (isFavoritesFolder(folder)) button.setAttribute('data-favorites', 'true');
     dom.folderList.append(button);
   }
 }
@@ -460,6 +562,10 @@ function renderHeader() {
   } else if (state.view === 'folder') {
     title = folder?.name || 'FOLDER';
     kicker = 'VAULT / FOLDER';
+    if (isFavoritesFolder(folder)) {
+      title = 'FAVORITES';
+      kicker = 'VAULT / FAVORITES';
+    }
   }
 
   dom.viewKicker.textContent = kicker;
@@ -481,7 +587,10 @@ function renderHeader() {
       }, [document.createTextNode('EMPTY TRASH')]),
     );
   }
-  if (state.view === 'folder' && folder) {
+  if (state.view === 'folders') {
+    dom.contextActions.append(actionButton('> NEW FOLDER', () => openFolderCreate(), 'btn-ghost'));
+  }
+  if (state.view === 'folder' && folder && !isFavoritesFolder(folder)) {
     dom.contextActions.append(
       h('button', {
         class: 'btn btn-ghost',
@@ -548,6 +657,7 @@ function renderFolderGrid() {
 
   const grid = h('div', { class: 'folder-grid' });
   for (const folder of state.folders) {
+    const protectedFolder = isFavoritesFolder(folder);
     const openButton = h('button', {
       class: 'folder-open',
       type: 'button',
@@ -555,7 +665,10 @@ function renderFolderGrid() {
       'data-folder-id': folder.id,
       'aria-label': `Open folder ${folder.name}, ${folder.count} ${plural(folder.count, 'tab')}`,
     }, [
-      h('span', { class: 'folder-mark', text: 'DIR //' }),
+      h('span', { class: 'folder-mark' }, [
+        buildFolderIcon(folder, 15),
+        h('span', { text: protectedFolder ? 'SPECIAL //' : 'DIR //' }),
+      ]),
       h('span', { class: 'folder-name', text: folder.name }),
       h('span', { class: 'folder-count' }, [
         h('strong', { text: formatNumber(folder.count) }),
@@ -565,20 +678,22 @@ function renderFolderGrid() {
 
     const footer = h('div', { class: 'folder-footer' }, [
       h('span', { text: folder.lastSavedAt ? `saved ${relativeTime(folder.lastSavedAt)}` : 'no saved tabs' }),
-      h('div', { class: 'folder-actions' }, [
-        h('button', {
-          type: 'button',
-          'data-action': 'rename-folder',
-          'data-folder-id': folder.id,
-          text: 'RENAME',
-        }),
-        h('button', {
-          type: 'button',
-          'data-action': 'delete-folder',
-          'data-folder-id': folder.id,
-          text: 'DELETE',
-        }),
-      ]),
+      protectedFolder
+        ? h('span', { class: 'folder-actions folder-actions-note', text: 'BUILT-IN' })
+        : h('div', { class: 'folder-actions' }, [
+            h('button', {
+              type: 'button',
+              'data-action': 'rename-folder',
+              'data-folder-id': folder.id,
+              text: 'RENAME',
+            }),
+            h('button', {
+              type: 'button',
+              'data-action': 'delete-folder',
+              'data-folder-id': folder.id,
+              text: 'DELETE',
+            }),
+          ]),
     ]);
 
     grid.append(h('article', { class: 'folder-card' }, [openButton, footer]));
@@ -658,12 +773,31 @@ function tabRow(entry) {
   } else {
     actions.append(
       h('button', {
+        class: `btn btn-ghost fav-btn${entry.favorite ? ' is-active' : ''}`,
+        type: 'button',
+        'data-action': 'toggle-favorite',
+        'data-id': entry.id,
+        'aria-pressed': entry.favorite ? 'true' : 'false',
+        'aria-label': entry.favorite ? `Remove ${entry.title} from favorites` : `Add ${entry.title} to favorites`,
+        title: entry.favorite ? 'Remove from favorites' : 'Add to favorites',
+        text: entry.favorite ? '\u2665' : '\u2661',
+      }),
+      h('button', {
         class: 'btn btn-ghost',
         type: 'button',
         'data-action': 'edit-tab',
         'data-id': entry.id,
         'aria-label': `Edit ${entry.title}`,
         text: 'EDIT',
+      }),
+      h('button', {
+        class: 'btn btn-ghost',
+        type: 'button',
+        'data-action': 'move-tab',
+        'data-id': entry.id,
+        'aria-label': `Move ${entry.title} to another folder`,
+        title: 'Move to another folder',
+        text: 'MOVE',
       }),
       h('button', {
         class: 'btn btn-ghost',
@@ -750,6 +884,10 @@ function onContentClick(event) {
   } else if (action === 'edit-tab') {
     const entry = findEntry(target.getAttribute('data-id'));
     if (entry) openEditDialog(entry);
+  } else if (action === 'move-tab') {
+    openMoveMenu(target);
+  } else if (action === 'toggle-favorite') {
+    void toggleFavorite(target.getAttribute('data-id'));
   } else if (action === 'trash-tab') {
     void trashEntry(target.getAttribute('data-id'));
   } else if (action === 'restore-tab') {
@@ -757,10 +895,14 @@ function onContentClick(event) {
   } else if (action === 'delete-forever') {
     void deleteForever(target.getAttribute('data-id'));
   } else if (action === 'rename-folder') {
-    const folder = state.folders.find((candidate) => candidate.id === target.getAttribute('data-folder-id'));
+    const folder = state.folders.find(
+      (candidate) => candidate.id === target.getAttribute('data-folder-id') && !isFavoritesFolder(candidate),
+    );
     if (folder) openFolderRename(folder);
   } else if (action === 'delete-folder') {
-    const folder = state.folders.find((candidate) => candidate.id === target.getAttribute('data-folder-id'));
+    const folder = state.folders.find(
+      (candidate) => candidate.id === target.getAttribute('data-folder-id') && !isFavoritesFolder(candidate),
+    );
     if (folder) void deleteFolder(folder);
   }
 }
@@ -839,6 +981,99 @@ async function restoreEntry(id) {
   } catch (error) {
     showToast(error?.message || 'Could not restore that tab.', { tone: 'error' });
   }
+}
+
+async function toggleFavorite(id) {
+  if (!id) return;
+  const entry = findEntry(id);
+  try {
+    const result = await vault.toggleFavorite(id);
+    // Keep the visible row in sync immediately, then reload for counts.
+    if (entry) entry.favorite = result.favorite;
+    const button = dom.content.querySelector(`[data-action="toggle-favorite"][data-id="${id}"]`);
+    if (button) {
+      button.classList.toggle('is-active', result.favorite);
+      button.textContent = result.favorite ? '\u2665' : '\u2661';
+      button.setAttribute('aria-pressed', result.favorite ? 'true' : 'false');
+      button.setAttribute(
+        'aria-label',
+        result.favorite ? `Remove ${entry?.title || 'this tab'} from favorites` : `Add ${entry?.title || 'this tab'} to favorites`,
+      );
+    }
+    showToast(result.favorite ? 'Added to Favorites. The tab stays in its folder.' : 'Removed from Favorites.');
+    await load({ resetLimit: false });
+  } catch (error) {
+    showToast(error?.message || 'Could not update favorites.', { tone: 'error' });
+  }
+}
+
+/**
+ * Replaces the MOVE button with an inline folder selector. Choosing a folder
+ * re-files the tab immediately; Escape or leaving without choosing restores
+ * the row unchanged.
+ */
+function openMoveMenu(button) {
+  const id = button?.getAttribute('data-id') || '';
+  const entry = findEntry(id);
+  if (!entry || button.dataset.busy === 'true') return;
+
+  const destinations = state.folders.filter((folder) => !isFavoritesFolder(folder));
+  if (!destinations.length) {
+    showToast('Create a folder first, then move tabs into it.', { tone: 'error' });
+    return;
+  }
+
+  const select = h('select', {
+    class: 'move-select',
+    'aria-label': `Move ${entry.title} to another folder`,
+  });
+  for (const folder of destinations) {
+    select.append(h('option', { value: folder.id, text: folder.name }));
+  }
+  const known = destinations.some((folder) => folder.id === entry.folderId);
+  if (!known && entry.folderId) {
+    select.append(h('option', { value: entry.folderId, text: entry.folderName || 'Current folder' }));
+  }
+  select.value = entry.folderId || destinations[0].id;
+
+  let settled = false;
+  const restore = () => {
+    if (settled) return;
+    settled = true;
+    void load({ resetLimit: false });
+  };
+
+  select.addEventListener('change', async () => {
+    if (settled) return;
+    settled = true;
+    const destination = select.value;
+    if (!destination || destination === entry.folderId) {
+      void load({ resetLimit: false });
+      return;
+    }
+    try {
+      await vault.updateTab(entry.id, { folderId: destination });
+      refreshBadge();
+      const folder = state.folders.find((candidate) => candidate.id === destination);
+      showToast(`Moved to ${folder?.name || 'folder'}.`);
+    } catch (error) {
+      showToast(error?.message || 'Could not move that tab.', { tone: 'error' });
+    } finally {
+      await load({ resetLimit: false });
+    }
+  });
+
+  select.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      restore();
+    }
+  });
+  select.addEventListener('blur', restore);
+
+  button.dataset.busy = 'true';
+  button.replaceWith(select);
+  select.focus();
 }
 
 async function deleteForever(id) {
@@ -971,6 +1206,7 @@ function openEditDialog(entry) {
   dom.editFolder.replaceChildren();
   const seen = new Set();
   for (const folder of state.folders) {
+    if (isFavoritesFolder(folder)) continue; // virtual collection, not a destination
     seen.add(folder.id);
     dom.editFolder.append(h('option', { value: folder.id, text: folder.name }));
   }

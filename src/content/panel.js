@@ -20,10 +20,17 @@
     PANEL_SNAPSHOT: 'cofre:panel-snapshot',
     SEARCH: 'cofre:search',
     TRASH_TAB: 'cofre:trash-tab',
+    TOGGLE_FAVORITE: 'cofre:toggle-favorite',
     OPEN_URL: 'cofre:open-url',
     OPEN_LIBRARY: 'cofre:open-library',
   };
   const SAVE_MIN_ANIMATION_MS = 360;
+  // Folder grid: 3 columns x 3 rows visible, advancing one row (3 folders)
+  // per navigation click. Must stay in sync with the CSS grid.
+  const GRID_VISIBLE = 9;
+  const GRID_STEP = 3;
+  const FAVORITES_FOLDER_ID = '__favorites__';
+  const PLAYFUL_GLYPHS = ['=^.^=', '<-<', ':3', '>_', '~/ ', '=^._.^=', '>w<', '~~>', '^.^', '<3'];
 
   if (window.__cofreTabsPanel && window.__cofreTabsPanel.open) return;
 
@@ -35,7 +42,8 @@
     snapshot: null,
     results: null,
     query: '',
-    version: '1.0.0',
+    version: '1.1.0',
+    theme: 'dark',
     host: null,
     shadow: null,
     panel: null,
@@ -45,6 +53,8 @@
     searchSeq: 0,
     closeTimer: 0,
     messageListener: null,
+    outsideListener: null,
+    folderOffset: 0,
   };
 
   // ---------------------------------------------------------------- utilities
@@ -102,6 +112,62 @@
     } catch {
       return false;
     }
+  }
+
+  /** Stable string hash so a folder always renders the same playful glyph. */
+  function hashString(value) {
+    const text = String(value || '');
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < text.length; i += 1) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash >>> 0;
+  }
+
+  function folderGlyph(seed) {
+    return PLAYFUL_GLYPHS[hashString(seed) % PLAYFUL_GLYPHS.length];
+  }
+
+  function folderIcon(kind) {
+    const svg = svgEl('svg', {
+      viewBox: '0 0 24 24',
+      width: '14',
+      height: '14',
+      'aria-hidden': 'true',
+      focusable: 'false',
+      class: `ct-folder-icon ct-folder-icon-${kind}`,
+    });
+    if (kind === 'favorites') {
+      svg.append(
+        svgEl('path', {
+          d: 'M12 20.4 4.6 13a4.6 4.6 0 0 1 0-6.5 4.7 4.7 0 0 1 6.6 0l.8.8.8-.8a4.7 4.7 0 0 1 6.6 0 4.6 4.6 0 0 1 0 6.5Z',
+          fill: 'currentColor',
+        }),
+      );
+    } else {
+      svg.append(
+        svgEl('path', {
+          d: 'M3.5 6.5h5.6l1.7 2h9.7v9.4a1.2 1.2 0 0 1-1.2 1.2H4.7a1.2 1.2 0 0 1-1.2-1.2Z',
+          fill: 'none',
+          stroke: 'currentColor',
+          'stroke-width': '1.6',
+          'stroke-linejoin': 'round',
+        }),
+      );
+    }
+    return svg;
+  }
+
+  /**
+   * Clamps the folder grid window: 9 folders visible, advancing one row of 3
+   * per step, never past the last valid position (final page may be partial).
+   */
+  function folderGridOffset(total, offset) {
+    const count = Number.isFinite(total) ? Math.max(0, Math.floor(total)) : 0;
+    const maxOffset = Math.max(0, Math.ceil((count - GRID_VISIBLE) / GRID_STEP) * GRID_STEP);
+    const wanted = Number.isFinite(offset) ? Math.floor(offset) : 0;
+    return Math.min(Math.max(0, wanted), maxOffset);
   }
 
   function delay(ms) {
@@ -196,6 +262,8 @@
     state.existing = data.existing;
     state.snapshot = data.snapshot;
     state.version = data.version || '1.0.0';
+    state.theme = data.theme === 'light' ? 'light' : 'dark';
+    state.folderOffset = 0;
     state.previouslyFocused = document.activeElement;
 
     const host = document.createElement('div');
@@ -270,13 +338,13 @@
       autocomplete: 'off',
       spellcheck: 'false',
     });
-    const folderChips = el('div', { class: 'ct-folders', 'aria-label': 'Vault folders' });
+    const folderGrid = el('div', { class: 'ct-folders', role: 'group', 'aria-label': 'Vault folders' });
     const results = el('div', { class: 'ct-results' });
 
     const vaultSection = el('section', { class: 'ct-section ct-vault-section', 'aria-labelledby': 'ct-vault-heading' }, [
       vaultHead,
       el('div', { class: 'ct-search' }, [el('span', { class: 'ct-search-prompt', 'aria-hidden': 'true', text: '>' }), searchInput]),
-      folderChips,
+      folderGrid,
       results,
     ]);
     vaultHead.querySelector('.ct-label').id = 'ct-vault-heading';
@@ -298,6 +366,7 @@
         'aria-modal': 'false',
         'aria-labelledby': 'ct-panel-title',
         'aria-describedby': 'ct-panel-desc',
+        'data-theme': state.theme,
       },
       [header, body, footer, srStatus, srAlert],
     );
@@ -325,7 +394,7 @@
       faviconWrap,
       vaultCount,
       searchInput,
-      folderChips,
+      folderGrid,
       results,
       srStatus,
       srAlert,
@@ -342,6 +411,7 @@
     panel.addEventListener('click', handlePanelClick);
     searchInput.addEventListener('input', handleSearchInput);
     shadow.addEventListener('keydown', handleKeydown);
+    attachOutsideClick();
 
     try {
       const listener = (message, _sender, sendResponse) => {
@@ -458,35 +528,14 @@
   }
 
   function renderVault() {
-    const { vaultCount, folderChips, results } = state.els;
+    const { vaultCount, results } = state.els;
     if (!vaultCount) return;
 
     const snapshot = state.snapshot || { stats: { active: 0, folders: 0, trashed: 0 }, folders: [], recent: [] };
     vaultCount.textContent = String(snapshot.stats?.active ?? 0);
 
-    folderChips.replaceChildren();
+    renderFolderGrid();
     const folders = Array.isArray(snapshot.folders) ? snapshot.folders : [];
-    for (const folder of folders) {
-      folderChips.append(
-        el(
-          'button',
-          {
-            class: 'ct-chip',
-            type: 'button',
-            'data-action': 'open-folder',
-            'data-folder-id': folder.id,
-            title: `Open ${folder.name} in the library`,
-          },
-          [
-            el('span', { class: 'ct-chip-name', text: folder.name }),
-            el('span', { class: 'ct-chip-count', text: String(folder.count) }),
-          ],
-        ),
-      );
-    }
-    if (!folders.length) {
-      folderChips.append(el('span', { class: 'ct-hint', text: 'no folders yet \u2014 save your first page.' }));
-    }
 
     if (state.query) {
       renderResults(state.results || []);
@@ -500,6 +549,103 @@
     } else {
       renderItems(snapshot.recent || []);
     }
+  }
+
+  /**
+   * Compact 3x3 folder grid. At most 9 folders are visible; the down control
+   * advances one row of 3 folders at a time, the up control steps back. The
+   * window is clamped so navigation can never pass the final folders and the
+   * layout stays 3x3 even when the last page is partial.
+   */
+  function renderFolderGrid() {
+    const { folderGrid } = state.els;
+    if (!folderGrid) return;
+    folderGrid.replaceChildren();
+
+    const snapshot = state.snapshot || {};
+    const folders = Array.isArray(snapshot.folders) ? snapshot.folders : [];
+    if (!folders.length) {
+      folderGrid.append(el('span', { class: 'ct-hint', text: 'no folders yet \u2014 save your first page.' }));
+      return;
+    }
+
+    const total = folders.length;
+    state.folderOffset = folderGridOffset(total, state.folderOffset);
+    const offset = state.folderOffset;
+    const visible = folders.slice(offset, offset + GRID_VISIBLE);
+
+    const grid = el('div', { class: 'ct-folder-grid' });
+    for (let index = 0; index < GRID_VISIBLE; index += 1) {
+      const folder = visible[index];
+      if (!folder) {
+        grid.append(el('span', { class: 'ct-folder-tile ct-folder-tile-empty', 'aria-hidden': 'true' }));
+        continue;
+      }
+      grid.append(folderTile(folder));
+    }
+    folderGrid.append(grid);
+
+    const maxOffset = folderGridOffset(total, Number.MAX_SAFE_INTEGER);
+    if (maxOffset > 0) {
+      const nav = el('div', { class: 'ct-folder-nav' }, [
+        offset > 0
+          ? el('button', {
+              class: 'ct-folder-nav-btn',
+              type: 'button',
+              'data-action': 'folders-up',
+              'aria-label': 'Show previous folders',
+              title: 'Previous folders',
+              text: '\u25b4',
+            })
+          : el('span', { class: 'ct-folder-nav-gap', 'aria-hidden': 'true' }),
+        el('span', {
+          class: 'ct-folder-position',
+          'aria-live': 'polite',
+          text: `${offset + 1}\u2013${Math.min(offset + GRID_VISIBLE, total)} / ${total}`,
+        }),
+        offset < maxOffset
+          ? el('button', {
+              class: 'ct-folder-nav-btn',
+              type: 'button',
+              'data-action': 'folders-down',
+              'aria-label': 'Show more folders',
+              title: 'More folders',
+              text: '\u25be',
+            })
+          : el('span', { class: 'ct-folder-nav-gap', 'aria-hidden': 'true' }),
+      ]);
+      folderGrid.append(nav);
+    }
+  }
+
+  function folderTile(folder) {
+    const name = String(folder.name || 'Folder');
+    const kind = folder.type === 'favorites' ? 'favorites' : folder.type === 'custom' ? 'custom' : 'site';
+    const count = Number(folder.count) || 0;
+
+    const iconHost = el('span', { class: 'ct-folder-tile-icon', 'aria-hidden': 'true' });
+    if (kind === 'custom') {
+      iconHost.append(el('span', { class: 'ct-folder-glyph', text: folderGlyph(folder.id || name) }));
+    } else {
+      iconHost.append(folderIcon(kind));
+    }
+
+    return el(
+      'button',
+      {
+        class: 'ct-folder-tile',
+        type: 'button',
+        'data-action': 'open-folder',
+        'data-folder-id': folder.id,
+        title: `Open ${name} in the library`,
+        'aria-label': `Open folder ${name}, ${count} ${count === 1 ? 'tab' : 'tabs'}`,
+      },
+      [
+        iconHost,
+        el('span', { class: 'ct-folder-tile-name', text: name }),
+        el('span', { class: 'ct-folder-tile-count', text: `${count}` }),
+      ],
+    );
   }
 
   function renderResults(items) {
@@ -547,6 +693,18 @@
         ]),
       ]);
 
+      const isFavorite = item.favorite === true;
+      const heart = el('button', {
+        class: `ct-item-fav${isFavorite ? ' is-active' : ''}`,
+        type: 'button',
+        'data-action': 'toggle-favorite',
+        'data-id': item.id,
+        'aria-pressed': isFavorite ? 'true' : 'false',
+        'aria-label': isFavorite ? `Remove ${title} from favorites` : `Add ${title} to favorites`,
+        title: isFavorite ? 'Remove from favorites' : 'Add to favorites',
+        text: isFavorite ? '\u2665' : '\u2661',
+      });
+
       const trash = el('button', {
         class: 'ct-item-del',
         type: 'button',
@@ -557,7 +715,7 @@
         text: 'DEL',
       });
 
-      results.append(el('div', { class: 'ct-item' }, [main, trash]));
+      results.append(el('div', { class: 'ct-item' }, [main, heart, trash]));
     }
   }
 
@@ -732,8 +890,61 @@
       void send({ type: MSG.OPEN_URL, payload: { url } });
       return;
     }
+    if (action === 'folders-up') {
+      state.folderOffset = folderGridOffset(
+        state.snapshot?.folders?.length ?? 0,
+        state.folderOffset - GRID_STEP,
+      );
+      renderFolderGrid();
+      focusFolderNav('folders-up');
+      return;
+    }
+    if (action === 'folders-down') {
+      state.folderOffset = folderGridOffset(
+        state.snapshot?.folders?.length ?? 0,
+        state.folderOffset + GRID_STEP,
+      );
+      renderFolderGrid();
+      focusFolderNav('folders-down');
+      return;
+    }
+    if (action === 'toggle-favorite') {
+      void handleToggleFavorite(target.getAttribute('data-id') || '');
+      return;
+    }
     if (action === 'trash-item') {
       void handleTrashItem(target.getAttribute('data-id') || '');
+    }
+  }
+
+  /** Keeps keyboard focus on the equivalent nav control after the grid re-renders. */
+  function focusFolderNav(action) {
+    if (!state.shadow) return;
+    const next = state.shadow.querySelector(`[data-action="${action}"]`);
+    if (next) {
+      try {
+        next.focus({ preventScroll: true });
+      } catch {
+        next.focus();
+      }
+    }
+  }
+
+  async function handleToggleFavorite(id) {
+    if (!id) return;
+    try {
+      const response = await send({ type: MSG.TOGGLE_FAVORITE, id });
+      if (!response?.ok) throw new Error(response?.error?.message || 'Favorite toggle failed');
+      const favorite = Boolean(response.data?.favorite);
+      for (const item of [...(state.results || []), ...((state.snapshot && state.snapshot.recent) || [])]) {
+        if (item && item.id === id) item.favorite = favorite;
+      }
+      if (state.existing && state.existing.id === id) state.existing.favorite = favorite;
+      announce(favorite ? 'Added to favorites.' : 'Removed from favorites.');
+      renderVault();
+      await refreshSnapshot();
+    } catch {
+      announce('Could not update favorites. Nothing was changed.', true);
     }
   }
 
@@ -755,6 +966,44 @@
     } catch {
       announce('Could not move that tab to the trash. Nothing was changed.', true);
     }
+  }
+
+  // ------------------------------------------------------------ outside click
+
+  /**
+   * Closes the panel when the user clicks anywhere on the page outside it.
+   *
+   * - The listener lives on `document` in the capture phase so it also sees
+   *   clicks that land on elements behind the panel or inside nested shadow
+   *   content; `composedPath()` makes the inside/outside test reliable across
+   *   Shadow DOM retargeting.
+   * - Exactly one listener is registered while the panel is open and it is
+   *   removed as soon as the panel starts closing, so reopening the panel can
+   *   never stack duplicate listeners.
+   * - Clicks inside the panel (folders, URLs, navigation controls) are never
+   *   swallowed: propagation is untouched, only genuinely outside clicks
+   *   close the panel.
+   */
+  function attachOutsideClick() {
+    detachOutsideClick();
+    state.outsideListener = (event) => {
+      if (!state.open || !state.host) return;
+      const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+      if (path.includes(state.host)) return;
+      if (event.target && typeof event.target.nodeType === 'number' && state.host.contains(event.target)) return;
+      closePanel();
+    };
+    document.addEventListener('click', state.outsideListener, true);
+  }
+
+  function detachOutsideClick() {
+    if (!state.outsideListener) return;
+    try {
+      document.removeEventListener('click', state.outsideListener, true);
+    } catch {
+      /* the browsing context may be unloading */
+    }
+    state.outsideListener = null;
   }
 
   function handleKeydown(event) {
@@ -790,6 +1039,7 @@
     state.open = false;
     clearTimeout(state.searchTimer);
     clearTimeout(state.closeTimer);
+    detachOutsideClick();
 
     const panel = state.panel;
     const host = state.host;

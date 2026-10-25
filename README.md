@@ -19,8 +19,7 @@ handing their browsing history to a bookmark service.
 Everything lives in IndexedDB inside your browser profile. There is no backend,
 no account, no sync, no analytics and no remote code.
 
-> **Project status:** v1.0.0 source is complete and tested locally. It has **not**
-> been published to the Chrome Web Store or to GitHub yet. See
+> **Project status:** v1.1.0 is complete, tested and packaged. See
 > [Release status](#release-status).
 
 ---
@@ -58,6 +57,21 @@ IndexedDB has confirmed the write.
 - **Trash with a way back.** Move entries to Trash, restore them, or permanently
   delete them from Trash. Restored tabs return to their original folder when it
   still exists; otherwise they are re-filed by domain.
+- **Favorites.** Heart any saved tab to collect it in the built-in **Favorites**
+  view — in both the library and the panel. Favoriting never moves or duplicates
+  the tab; it stays in its folder and is only tagged.
+- **Custom folders.** Create your own folders, rename them, and move saved tabs
+  into them from the inline MOVE selector. Deleting a folder is safe: its tabs go
+  to Trash instead of being destroyed, and Favorites can't be deleted.
+- **Light and dark themes.** A theme switch in the library sidebar, applied to
+  the library and the panel, persisted across launches, and defaulting to your
+  system preference until you choose.
+- **A compact folder grid.** The panel shows up to nine folders in a 3×3 grid
+  with icons, names and counts; when you have more, up/down controls step one
+  row at a time.
+- **Update notifications.** The library checks the official GitHub releases feed
+  (at most twice a day) and shows a dismissible banner when a newer version is
+  out. Nothing is downloaded or installed without you.
 - **Editable notes and titles.** Add context to a tab, fix a noisy page title or
   move it to another folder.
 - **Portable JSON backups.** Export active and trashed entries with a versioned
@@ -276,22 +290,30 @@ by reading the archive back before the SHA-256 is reported.
 
 ## Release status
 
-Honest status as of the v1.0.0 working tree:
+Honest status as of the v1.1.0 release:
 
-- **Source, tests, build and release packaging:** complete locally.
-- **GitHub repository:** prepared locally, **not published**. No GitHub
-  authentication/CLI was available in the build environment. Creating the public
-  repository and pushing is a manual owner action.
-- **Chrome Web Store:** **not submitted and not published**. Store listing copy
+- **Source, tests, build and release packaging:** complete. `v1.1.0` builds to
+  `dist/` and packages to `release/CofreTabs-v1.1.0.zip` (with a SHA-256 in
+  `release/CofreTabs-v1.1.0.json`).
+- **GitHub repository:** published at
+  [`MadalinWolf/CofreTabs`](https://github.com/MadalinWolf/CofreTabs). The
+  `v1.1.0` tag and GitHub Release carry the installable ZIP.
+- **Updates:** existing installs check the official GitHub releases feed about
+  every 12 hours and show a dismissible "update available" banner that links to
+  the release page. Updating is manual: download the release ZIP and reload the
+  unpacked extension. This is the correct model for an unpacked, non-store
+  extension — there is no permitted in-browser self-updater.
+- **Chrome Web Store:** **not submitted and not published.** Store listing copy
   and a submission checklist are prepared in [`docs/STORE.md`](docs/STORE.md)
   and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
-- **Website:** a static package is prepared in [`website/`](website/) but **not
-  deployed**.
+- **Website:** the landing page in [`website/`](website/) links to the official
+  GitHub release. Whether it is live depends on where `madwolfstudios.com` is
+  hosted.
 - **Donation link:** not yet configured. Search the repository for
   `TODO: ADD DONATION LINK`; the verified URL must be supplied by the owner.
 
-Do not treat any URL in this repository as a live download unless the owner has
-published it. No release ZIP is hosted by the project yet.
+Treat a URL as a live download only when it points at the published GitHub
+Release. No release ZIP is hosted by the project anywhere else.
 
 ---
 

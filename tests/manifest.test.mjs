@@ -137,7 +137,7 @@ test('packaging produces a verified, reproducible release ZIP', async (t) => {
   assert.ok(![...names].some((name) => name.endsWith('.map')));
   assert.ok(![...names].some((name) => name.includes('node_modules')));
 
-  const info = JSON.parse(await readFile(join(TEST_RELEASE, 'CofreTabs-v1.0.0.json'), 'utf8'));
+  const info = JSON.parse(await readFile(join(TEST_RELEASE, `CofreTabs-v${pkg.version}.json`), 'utf8'));
   assert.equal(info.sha256, summary.sha256);
   assert.equal(info.version, pkg.version);
 });

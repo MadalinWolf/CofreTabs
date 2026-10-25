@@ -46,8 +46,11 @@
 
         <section class="side-section" aria-labelledby="side-folders-title">
           <div class="side-head">
-            <h2 id="side-folders-title">WEBSITE FOLDERS</h2>
+            <h2 id="side-folders-title">FOLDERS</h2>
             <span class="side-meta" id="folder-count">0</span>
+            <button class="side-new-folder" type="button" id="btn-new-folder" title="Create a new folder" aria-label="Create a new folder">
+              <span aria-hidden="true">+</span>
+            </button>
           </div>
           <div class="folder-list" id="folder-list"></div>
         </section>
@@ -59,17 +62,21 @@
           <button class="btn btn-ghost btn-block" type="button" id="btn-export">EXPORT BACKUP</button>
           <button class="btn btn-ghost btn-block" type="button" id="btn-import">IMPORT BACKUP</button>
           <a class="side-link" href="privacy.html">PRIVACY POLICY</a>
-          <a class="side-link" href="https://github.com/MadalinWolf" target="_blank" rel="noopener noreferrer">
-            GITHUB PROFILE <span aria-hidden="true">↗</span>
-          </a>
+          <label class="theme-field">
+            <span class="theme-label">THEME</span>
+            <select id="theme-select" class="theme-select">
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </label>
         </section>
 
         <footer class="side-footer">
           <div class="storage-line" id="storage-line">0 saved · 0 folders</div>
           <div class="local-line"><span class="dot" aria-hidden="true">●</span> LOCAL ONLY · NO CLOUD</div>
           <div class="studio-line">
-            <span id="version-label">v1.0.0</span> ·
-            <a href="https://madwolfstudios.com/" target="_blank" rel="noopener noreferrer">MAD WOLF STUDIOS</a>
+            <span id="version-label">v1.1.0</span> ·
+            <a href="https://madwolfstudios.com/" target="_blank" rel="noopener noreferrer">MADWOLFSTUDIOS</a>
           </div>
         </footer>
       </aside>
@@ -112,6 +119,16 @@
           <div class="notice-text" id="notice-text"></div>
           <div class="notice-actions" id="notice-actions"></div>
           <button class="notice-close" type="button" id="notice-close" aria-label="Dismiss notice">×</button>
+        </div>
+
+        <div class="notice update-notice" id="update-banner" hidden>
+          <div class="notice-text" id="update-text"></div>
+          <div class="notice-actions">
+            <a class="btn btn-primary" id="update-open" href="https://github.com/MadalinWolf/CofreTabs/releases" target="_blank" rel="noopener noreferrer">
+              OPEN RELEASE
+            </a>
+            <button class="btn btn-ghost" type="button" id="update-dismiss">DISMISS</button>
+          </div>
         </div>
 
         <div class="list-head">
@@ -194,14 +211,14 @@
       </form>
     </dialog>
 
-    <!-- Folder rename -->
+    <!-- Folder create / rename -->
     <dialog class="dialog" id="dialog-folder" aria-labelledby="dialog-folder-title">
       <form method="dialog" class="dialog-body" id="form-folder" novalidate>
         <div class="dialog-head">
           <h2 id="dialog-folder-title">RENAME FOLDER</h2>
           <button class="dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
         </div>
-        <p class="dialog-hint">Renaming a folder only changes its label. Saved tabs keep their pages and timestamps.</p>
+        <p class="dialog-hint" id="folder-hint">Renaming a folder only changes its label. Saved tabs keep their pages and timestamps.</p>
         <label class="field">
           <span class="field-label">FOLDER NAME</span>
           <input id="folder-name" name="name" type="text" maxlength="60" required />

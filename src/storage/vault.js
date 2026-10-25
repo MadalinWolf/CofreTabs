@@ -4,7 +4,13 @@
  * Design notes:
  *  - One database ("cofretabs"), explicit schema versions, additive upgrades.
  *  - `tabs` holds saved pages, active or trashed. `deletedAt === null` means
- *    active. `folders` holds automatic website folders.
+ *    active. `folders` holds automatic website folders and user-created
+ *    custom folders (`type: 'site' | 'custom'`). Favorites are not a stored
+ *    folder: they are the virtual "Favorites" collection built from the
+ *    `favorite` flag on tab records, so favoriting never moves a bookmark.
+ *  - Schema stays at version 1: the `favorite` flag and folder `type` are
+ *    additive fields that default sensibly for records written by older
+ *    versions (missing `favorite` = false, missing `type` = 'site').
  *  - Duplicate detection compares the canonical URL of *active* entries only.
  *    A trashed entry does not block saving the page again.
  *  - No in-memory state is required for correctness: every read goes to the
@@ -13,6 +19,11 @@
 import { classifyUrl } from '../lib/domain.js';
 import { normalizePageUrl } from '../lib/url.js';
 import { buildBackup, normalizeBackupData, parseBackupText } from '../lib/backup.js';
+import {
+  FAVORITES_FOLDER_ID,
+  FAVORITES_KEY,
+  FAVORITES_NAME,
+} from '../lib/folders.js';
 import {
   cleanFolderName,
   cleanNote,
@@ -23,6 +34,7 @@ import {
 
 export const DB_NAME = 'cofretabs';
 export const SCHEMA_VERSION = 1;
+export { FAVORITES_FOLDER_ID };
 
 export class VaultError extends Error {
   constructor(code, message, details = null) {
@@ -246,7 +258,7 @@ export class Vault {
   async listFolders() {
     return this._read(['tabs', 'folders'], async (tx) => {
       const [folders, tabs] = await Promise.all([this._allFolders(tx), this._allTabs(tx)]);
-      return decorateFolders(folders, tabs);
+      return withFavoritesFolder(decorateFolders(folders, tabs), tabs);
     });
   }
 
@@ -261,6 +273,7 @@ export class Vault {
         trashed: trashed.length,
         total: tabs.length,
         folders: folders.length,
+        favorites: active.filter((entry) => entry.favorite === true).length,
         activeFolders: new Set(active.map((entry) => entry.folderId)).size,
         newestAt: timestamps.length ? Math.max(...timestamps) : null,
         oldestAt: timestamps.length ? Math.min(...timestamps) : null,
@@ -269,22 +282,28 @@ export class Vault {
   }
 
   /** Compact payload for the in-page slide-over panel. */
-  async getPanelSnapshot(recentLimit = 5) {
+  async getPanelSnapshot(recentLimit = 5, folderLimit = 60) {
     return this._read(['tabs', 'folders'], async (tx) => {
       const [folders, tabs] = await Promise.all([this._allFolders(tx), this._allTabs(tx)]);
       const active = tabs.filter((entry) => !entry.deletedAt).sort((a, b) => b.createdAt - a.createdAt);
-      const decorated = decorateFolders(folders, tabs);
+      const decorated = withFavoritesFolder(decorateFolders(folders, tabs), tabs);
+      const visible = decorated
+        .filter((folder, index) => index === 0 || folder.count > 0)
+        .sort((a, b) => {
+          if (a.id === FAVORITES_FOLDER_ID) return -1;
+          if (b.id === FAVORITES_FOLDER_ID) return 1;
+          return b.count - a.count || a.name.localeCompare(b.name);
+        })
+        .slice(0, folderLimit)
+        .map(publicFolder);
       return {
         stats: {
           active: active.length,
           trashed: tabs.length - active.length,
           folders: folders.length,
+          favorites: active.filter((entry) => entry.favorite === true).length,
         },
-        folders: decorated
-          .filter((folder) => folder.count > 0)
-          .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
-          .slice(0, 6)
-          .map(publicFolder),
+        folders: visible,
         recent: active.slice(0, recentLimit).map(publicEntry),
       };
     });
@@ -310,11 +329,13 @@ export class Vault {
     const tokens = tokenize(query);
     return this._read(['tabs', 'folders'], async (tx) => {
       const [folders, tabs] = await Promise.all([this._allFolders(tx), this._allTabs(tx)]);
-      const decorated = decorateFolders(folders, tabs);
+      const decorated = withFavoritesFolder(decorateFolders(folders, tabs), tabs);
       const includeTrash = view === 'trash';
       let items = tabs.filter((entry) => (includeTrash ? Boolean(entry.deletedAt) : !entry.deletedAt));
 
-      if (view === 'folder' && folderId) {
+      if (view === 'folder' && folderId === FAVORITES_FOLDER_ID) {
+        items = items.filter((entry) => entry.favorite === true);
+      } else if (view === 'folder' && folderId) {
         items = items.filter((entry) => entry.folderId === folderId);
       }
       if (tokens.length) {
@@ -340,6 +361,7 @@ export class Vault {
           active: tabs.filter((entry) => !entry.deletedAt).length,
           trashed: tabs.filter((entry) => Boolean(entry.deletedAt)).length,
           folders: folders.length,
+          favorites: tabs.filter((entry) => !entry.deletedAt && entry.favorite === true).length,
         },
       };
     });
@@ -390,6 +412,7 @@ export class Vault {
         folderName: materialized.folder.name,
         faviconUrl: cleanFavicon,
         note: cleanUserNote,
+        favorite: false,
         createdAt: nextTimestamp(),
         updatedAt: timestamp,
         deletedAt: null,
@@ -439,10 +462,62 @@ export class Vault {
         entry.folderId = folder.id;
         entry.folderName = folder.name;
       }
+      if (Object.prototype.hasOwnProperty.call(changes, 'favorite')) {
+        entry.favorite = changes.favorite === true;
+      }
 
       entry.updatedAt = now();
       await requestToPromise(tabStore.put(entry));
       return publicEntry(entry);
+    });
+  }
+
+  /**
+   * Toggles the Favorites flag on a saved tab.
+   *
+   * Favorites are a virtual collection built from this flag: the tab keeps its
+   * folder, title, note and timestamps. Passing `forced` makes the call
+   * idempotent (used after optimistic UI updates), so the same URL can never
+   * end up duplicated in Favorites.
+   */
+  async toggleFavorite(id, forced) {
+    return this._write(['tabs'], async (tx) => {
+      const store = tx.objectStore('tabs');
+      const entry = await requestToPromise(store.get(id));
+      if (!entry) throw new VaultError('NOT_FOUND', 'That saved tab no longer exists.');
+      const next = typeof forced === 'boolean' ? forced : entry.favorite !== true;
+      entry.favorite = next;
+      entry.updatedAt = now();
+      await requestToPromise(store.put(entry));
+      return { id: entry.id, favorite: next, entry: publicEntry(entry) };
+    });
+  }
+
+  /** Creates a user-defined custom folder. Names must be unique (case-insensitive). */
+  async createFolder(name) {
+    const cleanName = cleanFolderName(name);
+    if (!cleanName) throw new VaultError('INVALID_NAME', 'Folder names cannot be empty.');
+
+    return this._write(['folders'], async (tx) => {
+      const folderStore = tx.objectStore('folders');
+      const folders = await this._allFolders(tx);
+      const clash = folders.find((candidate) => candidate.name.toLowerCase() === cleanName.toLowerCase());
+      if (clash) {
+        throw new VaultError('DUPLICATE_NAME', `A folder is already called "${clash.name}".`);
+      }
+
+      const timestamp = now();
+      const id = newId('folder');
+      const folder = {
+        id,
+        key: `custom:${id}`,
+        name: cleanName,
+        type: 'custom',
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      };
+      await requestToPromise(folderStore.add(folder));
+      return publicFolder(folder);
     });
   }
 
@@ -552,6 +627,10 @@ export class Vault {
    * kept in the trash and will be re-filed from their URL on restore.
    */
   async deleteFolder(id) {
+    if (id === FAVORITES_FOLDER_ID) {
+      // Favorites is virtual and built into the product; it cannot be deleted.
+      throw new VaultError('PROTECTED_FOLDER', 'The Favorites folder is built in and cannot be deleted.');
+    }
     return this._write(['tabs', 'folders'], async (tx) => {
       const folderStore = tx.objectStore('folders');
       const tabStore = tx.objectStore('tabs');
@@ -630,6 +709,7 @@ export class Vault {
           createdAt: importedFolder.createdAt,
           updatedAt: timestamp,
         };
+        if (importedFolder.type === 'custom') folder.type = 'custom';
         await requestToPromise(folderStore.add(folder));
         existingFolders.push(folder);
         foldersByKey.set(folder.key, folder);
@@ -682,6 +762,7 @@ export class Vault {
           folderName: folder.name,
           faviconUrl: raw.faviconUrl,
           note: raw.note,
+          favorite: raw.favorite === true,
           createdAt: raw.createdAt,
           updatedAt: safeTimestamp(raw.updatedAt, nowTs),
           deletedAt: raw.deletedAt,
@@ -701,6 +782,23 @@ export class Vault {
 
   async importBackupText(text, mode = 'merge') {
     return this.importBackup(parseBackupText(text), mode);
+  }
+
+  /** Small key/value store for extension-local settings (e.g. the theme). */
+  async getMeta(key) {
+    if (typeof key !== 'string' || !key) return null;
+    return this._read(['meta'], async (tx) => {
+      const row = await requestToPromise(tx.objectStore('meta').get(key));
+      return row ? row.value ?? null : null;
+    });
+  }
+
+  async setMeta(key, value) {
+    if (typeof key !== 'string' || !key) throw new VaultError('INVALID_KEY', 'Meta keys must be non-empty strings.');
+    return this._write(['meta'], async (tx) => {
+      await requestToPromise(tx.objectStore('meta').put({ key, value }));
+      return { key, value };
+    });
   }
 
   /** Used by tests and by a future "reset vault" action. Not exposed in v1 UI. */
@@ -826,11 +924,30 @@ function decorateFolders(folders, tabs) {
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
+/** Prepends the virtual Favorites collection to a decorated folder list. */
+function withFavoritesFolder(decoratedFolders, tabs) {
+  const favoriteEntries = tabs.filter((entry) => !entry.deletedAt && entry.favorite === true);
+  const favorites = {
+    id: FAVORITES_FOLDER_ID,
+    key: FAVORITES_KEY,
+    name: FAVORITES_NAME,
+    type: 'favorites',
+    createdAt: 0,
+    updatedAt: null,
+    count: favoriteEntries.length,
+    lastSavedAt: favoriteEntries.length
+      ? Math.max(...favoriteEntries.map((entry) => entry.createdAt))
+      : null,
+  };
+  return [favorites, ...decoratedFolders];
+}
+
 function publicFolder(folder) {
   return {
     id: folder.id,
     key: folder.key,
     name: folder.name,
+    type: folder.type === 'custom' ? 'custom' : folder.id === FAVORITES_FOLDER_ID ? 'favorites' : 'site',
     createdAt: folder.createdAt,
     updatedAt: folder.updatedAt,
     count: folder.count ?? 0,
@@ -849,6 +966,7 @@ function publicEntry(entry) {
     folderName: entry.folderName,
     faviconUrl: entry.faviconUrl,
     note: entry.note,
+    favorite: entry.favorite === true,
     createdAt: entry.createdAt,
     updatedAt: entry.updatedAt,
     deletedAt: entry.deletedAt ?? null,

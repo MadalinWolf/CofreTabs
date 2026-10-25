@@ -13,10 +13,12 @@
 import { getVault, VaultError } from '../storage/vault.js';
 import { classifyUrl } from '../lib/domain.js';
 import { isRestrictedPage, parsePageUrl, safeHttpUrlForOpening } from '../lib/url.js';
+import { normalizeTheme } from '../lib/theme.js';
 import { MSG } from '../lib/messages.js';
 
 const PANEL_SCRIPT = 'src/content/panel.js';
 const LIBRARY_PAGE = 'src/library/library.html';
+const THEME_META_KEY = 'theme';
 const inFlightSaves = new Set();
 
 function logError(context, error) {
@@ -152,7 +154,11 @@ async function handlePanelInit(sender) {
 
   const vault = getVault();
   await vault.init();
-  const [existing, snapshot] = await Promise.all([vault.findByUrl(parsed.href), vault.getPanelSnapshot()]);
+  const [existing, snapshot, storedTheme] = await Promise.all([
+    vault.findByUrl(parsed.href),
+    vault.getPanelSnapshot(),
+    vault.getMeta(THEME_META_KEY).catch(() => null),
+  ]);
   const favicon =
     typeof tab?.favIconUrl === 'string' &&
     tab.favIconUrl.startsWith('data:image/') &&
@@ -174,10 +180,12 @@ async function handlePanelInit(sender) {
           id: existing.id,
           title: existing.title,
           folderName: existing.folderName,
+          favorite: existing.favorite === true,
           createdAt: existing.createdAt,
         }
       : null,
     snapshot,
+    theme: normalizeTheme(storedTheme) ?? 'dark',
     version: chrome.runtime.getManifest().version,
   };
 }
@@ -258,6 +266,11 @@ async function routeMessage(message, sender) {
       const result = await getVault().moveToTrash(message.id);
       await refreshBadge();
       return result;
+    }
+
+    case MSG.TOGGLE_FAVORITE: {
+      const forced = typeof message.forced === 'boolean' ? message.forced : undefined;
+      return getVault().toggleFavorite(message.id, forced);
     }
 
     case MSG.RESTORE_TAB: {

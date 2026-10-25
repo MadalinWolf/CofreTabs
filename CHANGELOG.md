@@ -8,7 +8,52 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 No changes yet.
 
-## [1.0.0] — Unreleased release candidate
+## [1.1.0] — 25 October 2026
+
+### Added
+
+- **Favorites**: a built-in, virtual Favorites collection with a heart toggle on
+  every saved tab (library and panel). Favoriting is non-destructive — the tab
+  keeps its folder — and is persisted, de-duplicated and counted in stats.
+- **Custom folders**: create, rename and delete your own folders from the
+  library. Deleting a folder is safe: its active tabs move to Trash (restorable)
+  instead of being destroyed. Favorites cannot be deleted.
+- **Move tabs between folders**: an inline MOVE folder-selector on each row
+  re-files a saved tab immediately, preserving title, URL, favicon and notes.
+- **Light and dark themes**: a theme selector in the library sidebar. The choice
+  is persisted (localStorage + vault meta), restored on launch, applied to both
+  the library and the injected panel, and defaults to the system preference when
+  unset. No wrong-theme flash.
+- **Folder grid redesign (panel)**: the folder popup is now a compact 3×3 grid
+  showing up to 9 folders with icons, names, counts, hover and active states.
+  Folders get stable personalities: site SVGs, a heart for Favorites and a
+  deterministic playful ASCII glyph for custom folders.
+- **Folder grid pagination**: with more than 9 folders, accessible up/down
+  controls step one row (3 folders) at a time, clamped to the final page, with a
+  live position readout and a stable partial last page.
+- **Outside-click close**: clicking anywhere outside the panel closes it;
+  inside clicks, folders, URLs and navigation keep working. Escape also closes,
+  listeners are removed on close, and focus is restored.
+- **Update notifications**: the library checks the official GitHub releases feed
+  (at most once every 12 hours) and shows a dismissible banner when a newer
+  version exists. Offline, rate-limit and malformed responses are silent no-ops;
+  installing stays a manual, user-approved step on the release page.
+
+### Changed
+
+- Branding text now reads **MADWOLFSTUDIOS** (was "MAD WOLF STUDIOS") in the
+  library footer and privacy page.
+- The GitHub profile link was removed from the fullscreen library interface.
+- Backup format (still schema 1) now round-trips the `favorite` flag and folder
+  `type` (`site` / `custom`); older backups import cleanly with defaults.
+
+### Security
+
+- Favorites and folder moves reuse the existing sanitised write paths; no new
+  permissions, no network writes, and the update check contacts only the public
+  GitHub releases endpoint with no vault data.
+
+## [1.0.0] — 25 October 2026
 
 ### Added
 
@@ -55,5 +100,6 @@ No changes yet.
 - Not published to GitHub or the Chrome Web Store; website not deployed.
 - Donation URL not configured (`TODO: ADD DONATION LINK`).
 
-[Unreleased]: https://github.com/MadalinWolf/CofreTabs/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/MadalinWolf/CofreTabs/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/MadalinWolf/CofreTabs/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.0.0
