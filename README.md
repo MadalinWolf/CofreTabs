@@ -54,7 +54,7 @@ CofreTabs is an independent project from **MadWolf Studios**. If it helps tame y
 |:--|:--|
 | ⭐ Star the project | [GitHub Repository](https://github.com/MadalinWolf/CofreTabs) |
 | 🐺 Follow the studio | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
-| ❤️ GitHub Sponsors | [Support Mad Wolf Studios](https://github.com/sponsors/MadalinWolf) |
+| ❤️ GitHub Sponsors | [Support MadWolf Studios](https://github.com/sponsors/MadalinWolf) |
 | ☕ Ko-fi | Coming soon |
 | 🎮 itch.io | Coming soon |
 | 🛍️ Gumroad | Coming soon |
@@ -69,11 +69,12 @@ Your support helps keep independent development, testing, documentation, and fut
 
 *GitHub Sponsors is the configured support destination listed here. Ko-fi, itch.io, and Gumroad are planned, not active payment links.*
 
+<!-- TODO: ADD DONATION LINK -->
 ---
 
 ## 🔗 Official Links
 
-- 🐺 **Studio:** [Mad Wolf Studios](https://madwolfstudios.com/)
+- 🐺 **Studio:** [MadWolf Studios](https://madwolfstudios.com/)
 - 💻 **Source code:** [GitHub Repository](https://github.com/MadalinWolf/CofreTabs)
 - 📦 **Releases:** [GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases)
 - 📝 **Privacy policy:** [`docs/PRIVACY.md`](docs/PRIVACY.md)
