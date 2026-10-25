@@ -1,6 +1,7 @@
+```markdown
 ```text
-  ____        __         _____     _       
- / ___| ___  / _|_ __ __|_   _|_ _| |__  ___
+ ____        __         _____     _
+/ ___| ___  / _|_ __ __|_   _|_ _| |__  ___
 | |   / _ \| |_| '__/ _ \| |/ _` | '_ \/ __|
 | |__| (_) |  _| | |  __/| | (_| | |_) \__ \
  \____\___/|_| |_|  \___||_|\__,_|_.__/|___/
@@ -11,376 +12,539 @@
 
 # CofreTabs
 
-CofreTabs is a Manifest V3 browser extension that turns the tab you are reading
-into a permanent, searchable entry in a private local vault. It is built for
-people who hoard "read later" tabs, research sessions and rabbit holes — without
-handing their browsing history to a bookmark service.
+CofreTabs is a Manifest V3 browser extension that turns the tab you're reading into a permanent, searchable entry in a private local vault. It's built for people who hoard "read later" tabs, research sessions, documentation, and rabbit holes — without handing their browsing collection to a bookmark service.
 
-Everything lives in IndexedDB inside your browser profile. There is no backend,
-no account, no sync, no analytics and no remote code.
+Everything lives in IndexedDB inside your browser profile. There is no backend, account, or cloud sync.
 
-> **Project status:** v1.1.0 is complete, tested and packaged. See
-> [Release status](#release-status).
+> **Project status:** The source declares version `1.1.0`. The repository is public, but the GitHub Releases page currently shows no published releases. See [Release Status](#-release-status) for the distinction between source availability and a downloadable release.
 
 ---
 
-## The 30-second version
+**💾 LOCAL FIRST** · **👤 NO ACCOUNTS** · **☁️ NO CLOUD** · **🚫 NO TRACKING** · **📡 NO TELEMETRY**
 
-1. Load the unpacked extension (instructions below).
-2. Browse to any normal `http(s)` page.
-3. Click the CofreTabs icon.
-4. Read what will be saved, then press **SAVE THIS TAB**.
-5. Open the library to search, organise, restore from Trash or back up.
-
-CofreTabs **never saves a page automatically**. The panel does not write to the
-vault until you press the save button, and the success state only appears after
-IndexedDB has confirmed the write.
+<p align="center"><strong>Built independently by Mad Wolf Studios 🐺</strong></p>
 
 ---
 
-## Features
+## 🚀 Get CofreTabs
 
-- **Explicit, honest saving.** A sliding panel on the right (~20% of the
-  viewport) shows the title, host, automatic folder and duplicate status before
-  you commit. The progress animation is tied to the real database write, not a
-  timer; a failed write is shown as a failure, never as success.
-- **Automatic folders from the real domain.** The bundled ICANN Public Suffix
-  List keeps `news.bbc.co.uk` under **BBC**, not under `co.uk`, while preserving
-  the original hostname on every saved tab. `www`, deep subdomains, IPv4/IPv6
-  literals and malformed URLs are handled. Shared hosting domains such as
-  `github.io` intentionally group by the platform because private PSL rules are
-  excluded.
-- **A library that stays usable at scale.** Search title, URL, hostname, folder
-  and notes. Sort by newest, oldest, title, domain or folder. Filter by folder or
-  Trash. Folders can be renamed; deleting a folder moves its tabs to Trash rather
-  than silently destroying them.
-- **Trash with a way back.** Move entries to Trash, restore them, or permanently
-  delete them from Trash. Restored tabs return to their original folder when it
-  still exists; otherwise they are re-filed by domain.
-- **Favorites.** Heart any saved tab to collect it in the built-in **Favorites**
-  view — in both the library and the panel. Favoriting never moves or duplicates
-  the tab; it stays in its folder and is only tagged.
-- **Custom folders.** Create your own folders, rename them, and move saved tabs
-  into them from the inline MOVE selector. Deleting a folder is safe: its tabs go
-  to Trash instead of being destroyed, and Favorites can't be deleted.
-- **Light and dark themes.** A theme switch in the library sidebar, applied to
-  the library and the panel, persisted across launches, and defaulting to your
-  system preference until you choose.
-- **A compact folder grid.** The panel shows up to nine folders in a 3×3 grid
-  with icons, names and counts; when you have more, up/down controls step one
-  row at a time.
-- **Update notifications.** The library checks the official GitHub releases feed
-  (at most twice a day) and shows a dismissible banner when a newer version is
-  out. Nothing is downloaded or installed without you.
-- **Editable notes and titles.** Add context to a tab, fix a noisy page title or
-  move it to another folder.
-- **Portable JSON backups.** Export active and trashed entries with a versioned
-  schema. Import supports **merge** and **replace**, validates the entire file
-  before writing, and reports duplicate/invalid counts. Backups never leave your
-  machine unless you move the file yourself.
-- **Retro terminal interface.** Scanline-free, reduced-motion-aware, keyboard
-  friendly, high-contrast phosphor green, with honest ARIA announcements instead
-  of confetti.
-- **No remote assets.** Icons, CSS and the Public Suffix List are bundled. Saved
-  favicons are only kept when the browser supplies an inline `data:image/*`
-  payload; otherwise the UI draws a monogram. CofreTabs makes no network request
-  for a favicon.
-- **Minimal permissions.** `activeTab` and `scripting` only. No `tabs`, no
-  `history`, no `bookmarks`, no host permissions, no background network access.
+### 📥 Downloads
+
+| Platform | Availability | Get it |
+|:--|:--|:--|
+| 🌐 Chrome Web Store | Not submitted or published | Coming soon |
+| 🟦 Microsoft Edge Add-ons | Not published | Coming soon |
+| 🦊 Firefox Add-ons | Not listed | Coming soon |
+| 🔴 Opera Add-ons | Not listed | Coming soon |
+| 🦁 Brave Browser | Manual installation | [Installation instructions](#-installation) |
+| 💾 GitHub Releases | No release currently listed | [Check GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases) |
+
+**Version declared by the project: `1.1.0`**
+
+CofreTabs supports Chromium-based browsers with Manifest V3, including Chrome 102+, Edge, Brave, Vivaldi, and Opera. Browser compatibility does not mean the extension is published in that browser's add-on store.
+
+> **No fake download buttons.** Until an official release or store listing is published, use the repository and the installation instructions below.
 
 ---
 
-## Screenshots
+## ❤️ Support Independent Development
 
-These were rendered in Chrome from the real panel/library code using a local
-fixture page and demo data. No personal browsing data is shown.
-[`docs/screenshots/README.md`](docs/screenshots/README.md) documents how they
-were captured.
+CofreTabs is an independent project from **Mad Wolf Studios**. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development makes a difference.
 
-**The save panel** — review first, then press the button:
+| Support | Link |
+|:--|:--|
+| ⭐ Star the project | [GitHub Repository](https://github.com/MadalinWolf/CofreTabs) |
+| 🐺 Follow the studio | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
+| ❤️ GitHub Sponsors | [Support Mad Wolf Studios](https://github.com/sponsors/MadalinWolf) |
+| ☕ Ko-fi | Coming soon |
+| 🎮 itch.io | Coming soon |
+| 🛍️ Gumroad | Coming soon |
 
-![CofreTabs slide-over panel on a local test page](docs/screenshots/panel.png)
+### 🐱 Help feed the Studio Cat
 
-**After the write is acknowledged** — success is shown only after the local
-database confirms:
+The Studio Cat has no understanding of software licensing, database integrity, or release engineering.
 
-![CofreTabs panel showing a saved state](docs/screenshots/panel-saved.png)
+The Studio Cat does understand snacks.
 
-**The library** — search, folders, notes and Trash:
+Your support helps keep independent development, testing, documentation, and future improvements going.
+
+*GitHub Sponsors is the configured support destination listed here. Ko-fi, itch.io, and Gumroad are planned, not active payment links.*
+
+---
+
+## 🔗 Official Links
+
+- 🐺 **Studio:** [Mad Wolf Studios](https://madwolfstudios.com/)
+- 💻 **Source code:** [GitHub Repository](https://github.com/MadalinWolf/CofreTabs)
+- 📦 **Releases:** [GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases)
+- 📝 **Privacy policy:** [`docs/PRIVACY.md`](docs/PRIVACY.md)
+- 🛠️ **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- 🔐 **Security reporting:** [`SECURITY.md`](SECURITY.md)
+- 📋 **Store preparation:** [`docs/STORE.md`](docs/STORE.md) · [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md)
+
+---
+
+## 🖥️ Take a Look Inside
+
+The screenshots below were captured in Chrome using the actual panel and library code with a local fixture page and demo data. No personal browsing data is shown. See [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture details.
+
+### The library
 
 ![CofreTabs library with demo tabs](docs/screenshots/library.png)
 
----
+### The save panel
 
-## Install (unpacked, developer mode)
+Review the current page before deciding whether to save it.
 
-CofreTabs supports Chromium-based browsers with Manifest V3 (Chrome 102+,
-Edge 102+, Brave, Vivaldi, Opera).
+![CofreTabs slide-over panel on a local test page](docs/screenshots/panel.png)
 
-### Chrome / Edge / Brave
+### Save confirmed
 
-1. Download or clone this repository.
-2. Build the loadable folder:
+The success state appears after the local database confirms the write.
 
-   ```sh
-   npm.cmd install       # Windows PowerShell
-   # or: npm install      # macOS / Linux
-   npm.cmd run build
-   ```
-
-   No bundler is involved: `dist/` is a validated copy of the runtime files.
-   If you prefer not to run Node, you can load the repository root instead,
-   but `dist/` is the supported artefact.
-
-3. Open `chrome://extensions` (or `edge://extensions`, `brave://extensions`).
-4. Enable **Developer mode**.
-5. Choose **Load unpacked** and select the `dist` folder.
-6. Pin CofreTabs to the toolbar.
-
-The toolbar icon opens the panel on the current page. A second click closes it.
-On browser-internal pages (`chrome://`, the Web Store, PDF viewers and other
-restricted URLs) the extension opens the library instead and explains why the
-page could not be read. Nothing is saved automatically there either.
+![CofreTabs panel showing a saved state](docs/screenshots/panel-saved.png)
 
 ---
 
-## Using CofreTabs
+## ⚡ The 30-second version
+
+1. Build and load the unpacked extension using the instructions below.
+2. Browse to a normal `http(s)` page.
+3. Click the CofreTabs toolbar icon.
+4. Review the page details and press **SAVE THIS TAB**.
+5. Open the library to search, organize, edit, restore, or back up your collection.
+
+> **No automatic saving.** Clicking the toolbar icon opens the panel; it does not save the page. The vault is written only after you explicitly press the save button. Success is shown only after IndexedDB confirms the write.
+
+---
+
+## 🐺 Why CofreTabs Exists
+
+We've all done it.
+
+You open a tab to read later. Then another. Then a documentation page, a project reference, an article, a tutorial, and something that looked interesting at 2 a.m.
+
+Eventually, your browser becomes an archaeological site of unfinished intentions.
+
+Bookmarks can help, but sometimes you want something more focused: a private, searchable place to collect the pages you're actually interested in keeping.
+
+CofreTabs was built for that.
+
+It gives you a dedicated vault for saved tabs, with automatic domain-based organization, search, folders, favorites, notes, Trash, and portable backups — without requiring an account or a cloud vault.
+
+### The idea is simple
+
+💾 **Your data stays local.** Your saved collection lives in IndexedDB inside your browser profile.
+
+🖱️ **You decide what gets saved.** Opening the panel is separate from the explicit save action.
+
+📁 **Your tabs stay organized.** CofreTabs classifies domains automatically and lets you create your own folders.
+
+🔍 **You can find things again.** Search titles, URLs, hostnames, folders, and notes.
+
+🔒 **Privacy comes first.** The extension requests only `activeTab` and `scripting`, with no declared host permissions or automatically running content scripts.
+
+🖥️ **The interface has personality.** A retro terminal-inspired design, phosphor-green accents, and honest status messages, with keyboard and reduced-motion considerations.
+
+CofreTabs isn't trying to become another cloud platform. It's a small, focused tool for keeping track of the things you want to read, research, or revisit.
+
+---
+
+## ✨ Features
+
+CofreTabs is designed to keep tab saving straightforward, predictable, and private.
+
+### 💾 Explicit Saving
+
+A sliding panel on the right side of the page — approximately 20% of the viewport width — shows the page title, hostname, automatic folder, and duplicate status before you commit.
+
+Press **SAVE THIS TAB** when you're ready.
+
+The progress state follows the actual database write. A failed write is reported as a failure, never as a success. Double-clicks and concurrent saves are rejected with a clear message.
+
+### 📁 Automatic Domain-Based Folders
+
+CofreTabs uses a bundled ICANN Public Suffix List to classify domains sensibly.
+
+For example, `news.bbc.co.uk` is filed under **BBC**, not `co.uk`, while the original hostname remains attached to the saved tab.
+
+Domain handling includes `www` prefixes, deep subdomains, IPv4 and IPv6 literals, malformed URLs, and shared hosting domains.
+
+**PSL detail:** Private Public Suffix List rules are intentionally excluded. As a result, shared hosting domains such as `github.io` group by the platform.
+
+### 🔍 Searchable Library
+
+Search by **page title · URL · hostname · folder · notes**.
+
+Sort by **newest · oldest · title · domain · folder**. Filter by folder or Trash.
+
+Folders can be renamed. Deleting a folder moves its active tabs to Trash instead of silently destroying them.
+
+### 🗑️ Trash and Recovery
+
+Move entries to Trash, restore them, or permanently delete them from Trash.
+
+When a tab is restored, it returns to its original folder if that folder still exists. Otherwise, it is re-filed by domain.
+
+Permanent deletion is available only from Trash and requires confirmation.
+
+### ❤️ Favorites
+
+Heart any saved tab to collect it in the built-in **Favorites** view.
+
+Favorites are available in both the library and the panel. Favoriting does not move or duplicate an entry: the tab stays in its existing folder and receives a favorite flag.
+
+The built-in Favorites folder cannot be deleted.
+
+### 📂 Custom Folders
+
+Create folders, rename them, and move saved tabs into them using the inline **MOVE** selector.
+
+Deleting a custom folder is safe: its active tabs go to Trash instead of being destroyed.
+
+### 🌙 Light and Dark Themes
+
+Switch themes from the library sidebar. The selected theme applies to both the library and the panel and persists across launches.
+
+Until you choose a theme, CofreTabs defaults to your system preference.
+
+### 🧩 Compact Folder Grid
+
+The panel displays up to nine folders in a **3×3 grid**, with icons, names, and counts.
+
+When there are more folders, up/down controls move through the grid one row at a time.
+
+### 📝 Editable Titles and Notes
+
+Give saved pages useful context. Edit a noisy page title, add a note explaining why you saved something, or move an entry into another folder.
+
+### 📦 Portable JSON Backups
+
+Export active and trashed entries into a versioned JSON backup.
+
+Import supports **merge** and **replace** modes, validates the entire file before writing, and reports duplicate and invalid entry counts.
+
+Malformed files are rejected before any data is written. Newer, unknown schema versions are refused with an upgrade message.
+
+Backups are created locally and do not leave your machine unless you move the exported file yourself.
+
+See [`docs/BACKUP-FORMAT.md`](docs/BACKUP-FORMAT.md) for the format specification.
+
+### 🖥️ Retro Terminal Interface
+
+A high-contrast, phosphor-green terminal-inspired interface — designed to feel like a small utility from a friendlier version of the 1990s.
+
+The interface is scanline-free, keyboard-friendly, and aware of reduced-motion preferences. Status messages use accessible ARIA announcements instead of decorative confetti.
+
+### 🖼️ No Remote Assets
+
+Icons, CSS, and the Public Suffix List are bundled with the extension.
+
+Saved favicons are retained only when the browser supplies an inline `data:image/*` payload. Otherwise, the interface draws a monogram.
+
+CofreTabs does not fetch remote favicon URLs.
+
+### 🔐 Minimal Permissions
+
+CofreTabs requests only:
+
+`activeTab` · `scripting`
+
+It does not declare `tabs`, `history`, or `bookmarks` permissions. It requests no host permissions and has no automatically running content scripts.
+
+See [Why these permissions?](#-privacy) for the explanation of each permission.
+
+---
+
+## 📥 Installation
+
+CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 102+ · Edge · Brave · Vivaldi · Opera**.
+
+### Requirements
+
+- Node.js 20+ (tested on Node 24)
+- npm
+- A Chromium-based browser for loading and manual checks
+
+### 1. Get the source
+
+Clone or download the repository:
+
+```sh
+git clone https://github.com/MadalinWolf/CofreTabs.git
+cd CofreTabs
+```
+
+Alternatively, download the repository ZIP from GitHub and extract it.
+
+### 2. Build the extension
+
+On Windows PowerShell:
+
+```powershell
+npm.cmd install
+npm.cmd run build
+```
+
+On macOS or Linux:
+
+```sh
+npm install
+npm run build
+```
+
+The build creates `dist/`, a validated copy of the runtime files. No bundler is involved.
+
+If you prefer not to run Node.js, the repository root can also be loaded, but `dist/` is the supported build artifact.
+
+### 3. Load it in your browser
+
+**Chrome:** open `chrome://extensions`  
+**Edge:** open `edge://extensions`  
+**Brave:** open `brave://extensions`
+
+Then:
+
+1. Enable **Developer mode**.
+2. Select **Load unpacked**.
+3. Choose the `dist/` folder.
+4. Pin CofreTabs to the toolbar.
+
+### 4. Start saving
+
+Open a normal web page and click the CofreTabs toolbar icon.
+
+On restricted browser pages — such as `chrome://` pages, the Web Store, and PDF viewers — Chromium may block panel injection. CofreTabs opens the library instead and explains why the page could not be read. Nothing is saved automatically there either.
+
+> **Windows note:** PowerShell may block the `npm.ps1` script because of the execution policy. Use `npm.cmd` as shown above.
+
+---
+
+## 🧭 Using CofreTabs
 
 ### Save the current tab
 
-Click the toolbar icon. The panel shows:
-
-- the page title and hostname;
-- the detected automatic folder;
-- a warning if the exact URL is already active in the vault;
-- a **SAVE THIS TAB** button.
+Click the toolbar icon. The panel shows the page title and hostname, the detected automatic folder, a warning if the exact URL is already active in the vault, and the **SAVE THIS TAB** button.
 
 Press it once. The button enters a progress state while the write is in flight.
-Double-clicks and concurrent saves are rejected with a clear message. On success
-the panel shows the folder and offers **OPEN LIBRARY**. On failure it says the
-save failed and keeps the page untouched.
 
-### Library
+- **Success:** the panel confirms the save and offers **OPEN LIBRARY**.
+- **Failure:** the panel reports the failure; it does not pretend the save succeeded.
+- **Repeated clicks:** double-clicks and concurrent saves are rejected with a clear message.
 
-Open the library from the panel, the extension's details page, or
-`chrome-extension://<id>/src/library/library.html`. From there you can:
+A second toolbar click closes an already-open panel.
 
-- search and sort the vault;
-- open a saved URL;
-- edit a title or note;
-- move a tab between folders;
-- move tabs to Trash, restore them, or delete permanently from Trash;
-- add a URL manually if a page could not be injected;
-- export a backup, or import one in merge/replace mode.
+### Use the library
+
+Open the library from the panel, the extension's details page, or the extension's own library page.
+
+From there, you can search and sort the vault, open saved URLs, edit titles and notes, move tabs between folders, use Trash and recovery, add a URL manually if a page could not be injected, and export or import a backup.
 
 ### Backup format
 
-Exports use `format: "cofretabs-backup"` and `schemaVersion: 1`. The file is
-plain UTF-8 JSON and includes folders, active tabs and trashed tabs. Import is
-all-or-nothing: a malformed file is rejected before anything is written.
-Newer, unknown schema versions are refused with an upgrade message. See
-[`docs/BACKUP-FORMAT.md`](docs/BACKUP-FORMAT.md).
+Exports use:
+
+- `format: "cofretabs-backup"`
+- `schemaVersion: 1`
+
+The file is plain UTF-8 JSON and includes folders, active tabs, and trashed tabs.
+
+Import is **all-or-nothing**: a malformed file is rejected before anything is written. Newer, unknown schema versions are refused with an upgrade message.
+
+See [`docs/BACKUP-FORMAT.md`](docs/BACKUP-FORMAT.md).
 
 ### Keyboard and accessibility
 
-- `Escape` closes the panel or an open dialog.
-- Focus is moved into the panel/dialog and returned on close.
-- Status messages use a polite live region; errors use an assertive one.
-- Animations respect `prefers-reduced-motion: reduce`, and the save flow then
-  skips the decorative delay entirely.
+`Escape` closes the panel or an open dialog. Focus moves into the panel or dialog and returns when it closes.
+
+Status messages use a polite live region; errors use an assertive one. Animations respect `prefers-reduced-motion: reduce`, and the save flow skips the decorative delay when reduced motion is requested.
 
 ---
 
-## Privacy
+## 🔒 Privacy
 
-CofreTabs is local-first by construction:
+CofreTabs is designed around a local vault.
 
-- saved tabs, folders and notes live in IndexedDB in your browser profile;
-- there are no accounts, servers, telemetry, ads or third-party scripts;
-- the extension makes **no runtime network requests**; the panel stylesheet is
-  loaded from the extension package itself;
-- no remote favicon URLs are stored or fetched;
-- exports are created locally and downloaded by the browser;
-- removing the extension or clearing extension data removes the vault.
+- **Storage:** saved tabs, folders, and notes live in IndexedDB in your browser profile.
+- **Accounts:** no account or cloud vault is required.
+- **Analytics:** no analytics or telemetry system is included in the documented extension design.
+- **Remote assets:** the panel stylesheet, icons, and Public Suffix List are bundled with the extension.
+- **Favicons:** no remote favicon URL is fetched; only an inline `data:image/*` favicon supplied by the browser may be retained.
+- **Backups:** exports are created locally and downloaded by the browser.
+- **Removal:** uninstalling the extension or clearing its extension data removes the local vault, so export a backup first if you want to keep your collection.
 
-The full policy is in [`docs/PRIVACY.md`](docs/PRIVACY.md) and is also bundled at
-`src/library/privacy.html`.
+The extension's permissions are limited to `activeTab` and `scripting`; it declares no host permissions and no content scripts that run automatically.
+
+Read the full policy in [`docs/PRIVACY.md`](docs/PRIVACY.md). A copy is also bundled at `src/library/privacy.html`.
 
 ### Why these permissions?
 
 | Permission | Why it is needed |
-| --- | --- |
-| `activeTab` | Read the current tab's title/URL only after you click the toolbar icon. |
-| `scripting` | Inject the slide-over panel into that tab when you click. |
+|:--|:--|
+| `activeTab` | Read the current tab's title and URL after you click the toolbar icon. |
+| `scripting` | Inject the slide-over panel into the tab after you click. |
 
-That is the complete permission list. There are no host permissions and no
-content scripts declared to run automatically. The service worker uses the
-browser's own tab API only in response to a toolbar click or panel interaction.
+That's the declared permission list. The service worker uses the browser's tab API in response to toolbar clicks or panel interactions.
 
 ---
 
-## Development
+## 📦 Release Status
 
-Requirements: Node.js 20+ (tested on Node 24), npm, and a Chromium browser for
-manual checks. `npm` on Windows PowerShell may be blocked by execution policy;
-use `npm.cmd` or call `node` directly.
+**Version in the source manifest and package metadata: `1.1.0`.**
 
-```sh
+The repository's code and version metadata are available publicly, but the GitHub Releases page currently reports that there are no published releases.
+
+| Item | Status |
+|:--|:--|
+| Source repository | Public |
+| Version in `manifest.json` and `package.json` | `1.1.0` |
+| Chrome Web Store | Not submitted or published |
+| Microsoft Edge Add-ons | Not published |
+| Firefox Add-ons | Not listed |
+| Opera Add-ons | Not listed |
+| GitHub Releases | No release currently listed |
+| Independent store approval | Not claimed |
+
+**Important:** A version number in the source is not proof that a downloadable release has been published. Check the [GitHub Releases page](https://github.com/MadalinWolf/CofreTabs/releases) for actual release assets before treating a ZIP as an official release.
+
+Store listing copy and submission preparation are documented in [`docs/STORE.md`](docs/STORE.md) and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
+
+The `website/` directory contains a static landing-page package. Its presence in the repository does not, by itself, establish whether that package is deployed to the public website.
+
+---
+
+## ❓ FAQ
+
+**Does CofreTabs sync between devices?**  
+No. Use JSON export/import to move a vault manually.
+
+**Does it save pages automatically?**  
+No. Not on installation, toolbar click, or navigation. Only the explicit save button writes a tab record.
+
+**Can it save `chrome://` pages?**  
+No. Chromium blocks injection on restricted pages. CofreTabs opens the library with an explanation and a manual-add option for valid `http(s)` URLs.
+
+**Why is my `github.io` site filed under GitHub Pages?**  
+Only the ICANN section of the Public Suffix List is bundled. Private suffix rules are deliberately excluded, so shared platforms group together.
+
+**What happens if I delete a folder?**  
+Its active tabs move to Trash and lose their folder reference. Restoring a tab re-files it by domain if the folder no longer exists. Permanent deletion is available only from Trash and requires confirmation.
+
+**Where is my data?**  
+In IndexedDB inside your browser profile. There is no cloud copy. Export a backup before uninstalling or clearing extension data.
+
+**Does the badge number include Trash?**  
+No. It counts active entries only, capped visually at `999+`.
+
+**Is favicon data sent anywhere?**  
+CofreTabs does not fetch remote favicon URLs. It retains only inline `data:image/*` favicons supplied by the browser.
+
+**Why can't I find CofreTabs in my browser's extension store?**  
+The store listings are not currently published. Use the manual installation instructions until an official listing becomes available.
+
+---
+
+## 🛠️ Development
+
+### Requirements
+
+Node.js 20+ (tested on Node 24), npm, and a Chromium browser for manual checks.
+
+On Windows PowerShell, `npm` may be blocked by the execution policy. Use `npm.cmd` or call Node directly.
+
+### Commands
+
+```powershell
 npm.cmd install
-npm.cmd test             # node --test (all unit + DOM tests)
-npm.cmd run test:verbose # spec reporter
-npm.cmd run build        # validate + copy into dist/
-npm.cmd run package      # build + release/CofreTabs-v1.0.0.zip + SHA-256
-npm.cmd run icons        # regenerate PNG icons from the pixel grid
-npm.cmd run psl          # refresh the bundled ICANN PSL snapshot
+npm.cmd test             # Run all unit and DOM tests
+npm.cmd run test:verbose # Detailed test reporter
+npm.cmd run build        # Validate and copy into dist/
+npm.cmd run package      # Build and create a release ZIP + SHA-256
+npm.cmd run icons        # Regenerate PNG icons from the pixel grid
+npm.cmd run psl          # Refresh the bundled ICANN PSL snapshot
 ```
+
+On macOS and Linux, use `npm` in place of `npm.cmd`.
 
 ### Project layout
 
 ```text
 manifest.json              Manifest V3 entry point
-src/background/            service worker: toolbar, messages, badge
-src/content/panel.js       self-contained slide-over panel (classic script)
-src/library/               library UI and bundled privacy page
-src/storage/vault.js       IndexedDB vault, search, trash, import/export
-src/lib/                   URL/domain, PSL data, sanitisation, backup, format
-src/styles/                terminal panel and library CSS
-assets/icons/              logo, favicon and generated PNG icons
-scripts/                   build, package, zero-dependency ZIP, PSL, icons
-tests/                     node:test suites (domain, storage, backup, panel)
-docs/                      architecture, privacy, QA, store, backup, release notes
-website/                   static landing page package (not deployed)
+src/background/             Service worker: toolbar, messages, badge
+src/content/panel.js        Self-contained slide-over panel
+src/library/                Library UI and bundled privacy page
+src/storage/vault.js        IndexedDB vault, search, Trash, import/export
+src/lib/                    URL/domain, PSL data, sanitisation, backup, format
+src/styles/                 Terminal panel and library CSS
+assets/icons/               Logo, favicon, and generated PNG icons
+scripts/                    Build, package, ZIP, PSL, and icon tooling
+tests/                      node:test suites
+docs/                       Architecture, privacy, QA, store, backup, release docs
+website/                    Static landing-page package
 ```
 
 ### Tests
 
-The suites run against `fake-indexeddb` and `jsdom`, so they exercise the real
-storage code and the real panel script without a browser:
+The test suites use `fake-indexeddb` and `jsdom` to exercise the storage code and panel script without a real browser.
+
+Run:
 
 ```sh
-node --test
+npm test
 ```
 
-Coverage highlights: PSL/domain classification, URL normalisation, schema
-validation, merge/replace import, trash and folder deletion, duplicate handling,
-manual add, XSS-safe rendering, no-auto-save behaviour, double-click rejection,
-truthful success/failure states, and accessible panel close handling.
+Coverage includes Public Suffix List/domain classification, URL normalization, schema validation, merge/replace import, Trash and folder deletion, duplicate handling, manual add, XSS-safe rendering, no-auto-save behavior, double-click rejection, truthful success/failure states, and accessible panel close handling.
 
-A manual browser pass is still required for things jsdom cannot verify: real
-toolbar injection, browser storage quotas, downloads and visual rendering. Use
-[`docs/QA-CHECKLIST.md`](docs/QA-CHECKLIST.md). The GitHub Actions workflow in
-`.github/workflows/ci.yml` runs the tests, build and package on every push.
+A manual browser pass is still required for things jsdom cannot verify, including real toolbar injection, browser storage quotas, downloads, and visual rendering.
+
+Use [`docs/QA-CHECKLIST.md`](docs/QA-CHECKLIST.md). The GitHub Actions workflow is located at `.github/workflows/ci.yml`.
 
 ### Build integrity checks
 
-`scripts/build.mjs` fails the build if, among other things:
+`scripts/build.mjs` checks the extension before building. Among other things, the build fails if:
 
-- the manifest requests forbidden permissions or host permissions;
-- an icon is missing or the wrong pixel size;
-- HTML contains inline scripts or event-handler attributes;
-- runtime code uses `eval`, `new Function`, `innerHTML =`, `document.write`,
-  `chrome.storage`, or a remote `fetch`;
-- a referenced file or ES module is missing;
-- the build would land outside the repository.
+- The manifest requests forbidden permissions or host permissions.
+- An icon is missing or has the wrong pixel size.
+- HTML contains inline scripts or event-handler attributes.
+- Runtime code uses `eval`, `new Function`, `innerHTML =`, `document.write`, `chrome.storage`, or a remote `fetch`.
+- A referenced file or ES module is missing.
+- The build would write outside the repository.
 
-Release ZIPs are written by a dependency-free ZIP implementation and verified
-by reading the archive back before the SHA-256 is reported.
+Release ZIPs are created by a dependency-free ZIP implementation and verified by reading the archive back before the SHA-256 is reported.
 
 ---
 
-## Release status
+## 🤝 Contributing
 
-Honest status as of the v1.1.0 release:
+Bug reports, accessibility fixes, and focused pull requests are welcome.
 
-- **Source, tests, build and release packaging:** complete. `v1.1.0` builds to
-  `dist/` and packages to `release/CofreTabs-v1.1.0.zip` (with a SHA-256 in
-  `release/CofreTabs-v1.1.0.json`).
-- **GitHub repository:** published at
-  [`MadalinWolf/CofreTabs`](https://github.com/MadalinWolf/CofreTabs). The
-  `v1.1.0` tag and GitHub Release carry the installable ZIP.
-- **Updates:** existing installs check the official GitHub releases feed about
-  every 12 hours and show a dismissible "update available" banner that links to
-  the release page. Updating is manual: download the release ZIP and reload the
-  unpacked extension. This is the correct model for an unpacked, non-store
-  extension — there is no permitted in-browser self-updater.
-- **Chrome Web Store:** **not submitted and not published.** Store listing copy
-  and a submission checklist are prepared in [`docs/STORE.md`](docs/STORE.md)
-  and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
-- **Website:** the landing page in [`website/`](website/) links to the official
-  GitHub release. Whether it is live depends on where `madwolfstudios.com` is
-  hosted.
-- **Donation link:** not yet configured. Search the repository for
-  `TODO: ADD DONATION LINK`; the verified URL must be supplied by the owner.
+Before contributing, read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
-Treat a URL as a live download only when it points at the published GitHub
-Release. No release ZIP is hosted by the project anywhere else.
+For security issues, follow [`SECURITY.md`](SECURITY.md) instead of opening a public issue.
 
 ---
 
-## FAQ
-
-**Does CofreTabs sync between devices?**
-No. Use JSON export/import to move a vault manually.
-
-**Does it save pages automatically?**
-No. Not on install, not on toolbar click, not on navigation. Only the explicit
-save button writes a tab record.
-
-**Can it save `chrome://` pages?**
-No. Chromium blocks injection there. CofreTabs opens the library with an
-explanation and a manual-add option for valid `http(s)` URLs.
-
-**Why is my `github.io` site filed under GitHub Pages?**
-Only the ICANN section of the Public Suffix List is bundled. Private suffix
-rules are deliberately excluded so shared platforms group together.
-
-**What happens if I delete a folder?**
-Its active tabs move to Trash and lose their folder reference. Restoring a tab
-re-files it by domain if the folder no longer exists. Permanent deletion is only
-possible from Trash, with confirmation.
-
-**Where is my data?**
-In IndexedDB inside your browser profile. There is no cloud copy. Export a
-backup before uninstalling or clearing extension data.
-
-**Does the badge number include Trash?**
-No. It counts active entries only, capped visually at `999+`.
-
-**Is favicon data sent anywhere?**
-No. Only inline `data:image/*` favicons supplied by the browser are stored. No
-remote URL is fetched.
-
----
-
-## Contributing
-
-Bug reports, accessibility fixes and focused pull requests are welcome. Read
-[`CONTRIBUTING.md`](CONTRIBUTING.md) and the
-[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) first. Security issues should follow
-[`SECURITY.md`](SECURITY.md), not public issues.
-
-## License
+## 📜 License
 
 MIT © 2026 Mad Wolf Studios. See [`LICENSE`](LICENSE).
+
 Third-party notices: [`docs/THIRD-PARTY.md`](docs/THIRD-PARTY.md).
 
 ---
 
 ```console
-┌─[ MADWOLF STUDIOS ]─────────────────────────────────────────────┐
-│                                                                 │
-│   Thanks for using CofreTabs.                                   │
-│                                                                 │
-│   If this saved your tab sanity:                                │
-│     ★ star the repository → github.com/MadalinWolf/CofreTabs    │
-│     → follow the studio    → github.com/MadalinWolf             │
-│     ♥ donate               → github.com/sponsors/MadalinWolf    │
-│                                                                 │
-│   More experiments: https://madwolfstudios.com/                 │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+┌─[ MADWOLF STUDIOS ]────────────────────────────────────────────────┐
+│                                                                    │
+│   Thanks for using CofreTabs.                                      │
+│                                                                    │
+│   If this saved your tab sanity:                                   │
+│     ★ star the project  → github.com/MadalinWolf/CofreTabs         │
+│     → follow the studio → github.com/MadalinWolf                  │
+│     ♥ support the work  → github.com/sponsors/MadalinWolf          │
+│                                                                    │
+│   Your tabs. Your vault. Your device.                              │
+│   More experiments: https://madwolfstudios.com/                    │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
 ```
-
-The donation line is intentionally marked `TODO: ADD DONATION LINK`. No payment
-URL has been invented; the project owner should replace it with a verified link
-before publishing.
+```
