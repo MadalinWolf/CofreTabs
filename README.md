@@ -15,8 +15,6 @@ CofreTabs is a Manifest V3 browser extension that turns the tab you're reading i
 
 Everything lives in IndexedDB inside your browser profile. There is no backend, account, or cloud sync.
 
-> **Project status:** The source declares version `1.1.0`. The repository is public, but the GitHub Releases page currently shows no published releases. See [Release Status](#-release-status) for the distinction between source availability and a downloadable release.
-
 ---
 
 **💾 LOCAL FIRST** · **👤 NO ACCOUNTS** · **☁️ NO CLOUD** · **🚫 NO TRACKING** · **📡 NO TELEMETRY**
