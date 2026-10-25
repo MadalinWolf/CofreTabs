@@ -19,7 +19,7 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 **💾 LOCAL FIRST** · **👤 NO ACCOUNTS** · **☁️ NO CLOUD** · **🚫 NO TRACKING** · **📡 NO TELEMETRY**
 
-<p align="center"><strong>Built independently by Mad Wolf Studios 🐺</strong></p>
+<p align="center"><strong>Built independently by <a href="https://madwolfstudios.com/">MadWolf Studios 🐺</a></strong></p>
 
 ---
 
@@ -34,19 +34,21 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 | 🦊 Firefox Add-ons | Not listed | Coming soon |
 | 🔴 Opera Add-ons | Not listed | Coming soon |
 | 🦁 Brave Browser | Manual installation | [Installation instructions](#-installation) |
-| 💾 GitHub Releases | No release currently listed | [Check GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases) |
+| 💾 GitHub Releases | ✅ v1.1.0 Published | [View Release & Downloads](https://github.com/MadalinWolf/CofreTabs/releases/latest) |
 
-**Version declared by the project: `1.1.0`**
+**Current version:** `1.1.0`
 
-CofreTabs supports Chromium-based browsers with Manifest V3, including Chrome 102+, Edge, Brave, Vivaldi, and Opera. Browser compatibility does not mean the extension is published in that browser's add-on store.
+**Browser compatibility:** Chrome 109+, Microsoft Edge, Brave, Vivaldi, and Opera (Chromium-based browsers supporting Manifest V3).
 
-> **No fake download buttons.** Until an official release or store listing is published, use the repository and the installation instructions below.
+*Browser compatibility does not mean the extension is available in each browser's official add-on store.*
+
+---
 
 ---
 
 ## ❤️ Support Independent Development
 
-CofreTabs is an independent project from **Mad Wolf Studios**. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development makes a difference.
+CofreTabs is an independent project from **MadWolf Studios**. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development makes a difference.
 
 | Support | Link |
 |:--|:--|
@@ -255,7 +257,7 @@ See [Why these permissions?](#-privacy) for the explanation of each permission.
 
 ## 📥 Installation
 
-CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 102+ · Edge · Brave · Vivaldi · Opera**.
+CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 109+ · Edge · Brave · Vivaldi · Opera**.
 
 ### Requirements
 
@@ -389,24 +391,17 @@ That's the declared permission list. The service worker uses the browser's tab A
 
 **Version in the source manifest and package metadata: `1.1.0`.**
 
-The repository's code and version metadata are available publicly, but the GitHub Releases page currently reports that there are no published releases.
-
 | Item | Status |
 |:--|:--|
-| Source repository | Public |
-| Version in `manifest.json` and `package.json` | `1.1.0` |
-| Chrome Web Store | Not submitted or published |
+| Source repository | ✅ Public |
+| Current version | `1.1.0` |
+| Chrome Web Store | Not published |
 | Microsoft Edge Add-ons | Not published |
 | Firefox Add-ons | Not listed |
 | Opera Add-ons | Not listed |
-| GitHub Releases | No release currently listed |
-| Independent store approval | Not claimed |
-
-**Important:** A version number in the source is not proof that a downloadable release has been published. Check the [GitHub Releases page](https://github.com/MadalinWolf/CofreTabs/releases) for actual release assets before treating a ZIP as an official release.
+| GitHub Releases | ✅ [CofreTabs v1.1.0 — View release](https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0) |
 
 Store listing copy and submission preparation are documented in [`docs/STORE.md`](docs/STORE.md) and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
-
-The `website/` directory contains a static landing-page package. Its presence in the repository does not, by itself, establish whether that package is deployed to the public website.
 
 ---
 
