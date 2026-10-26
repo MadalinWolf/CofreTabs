@@ -2,7 +2,7 @@
 
 **Release date:** 2026-10-25
 **Package:** `CofreTabs-v1.1.0.zip` → `CofreTabs-v1.1.0/` (load unpacked)
-**Manifest:** v3, Chrome 109+, local-only. No build step, no server, no accounts.
+**Manifest:** v3, Chrome 102+, local-only. No build step, no server, no accounts.
 
 This release completes the roadmap announced with v1.0.0: folder navigation and
 management, Favorites, appearance, and an in-app update notice — with the core
@@ -71,9 +71,10 @@ local-only, privacy-first architecture unchanged.
    the `v1.1.0` tag in your local clone and run `node scripts/build.mjs`.
 3. In `chrome://extensions`, remove (or update the path of) the old CofreTabs
    entry and **Load unpacked** the extracted/built `CofreTabs-v1.1.0` folder.
-4. Click the CofreTabs toolbar button and sign in again with your password —
-   all tabs, folders, Trash, and settings are restored from local storage.
-5. Optional: **Restore** the backup file if you prefer a file-based restore.
+4. In `chrome://extensions`, load the extracted/built `CofreTabs-v1.1.0` folder
+   with **Load unpacked**. Your vault already lives in local storage — all tabs,
+   folders, Trash, favorites and settings are there; nothing else to restore.
+5. Optional: **Restore** a backup file if you prefer a file-based restore.
 
 ## Verification
 
@@ -88,9 +89,14 @@ local-only, privacy-first architecture unchanged.
 
 ## Notes
 
-- Known limitations from v1.0.0 still apply (single trash folder, one search
-  tab per panel, ~50 tab cap, popup reopens after sign-in).
-- This release does not change the crypto design (PBKDF2-SHA256, 310,000
-  iterations, AES-256-GCM) or the local-only data model.
+- Known limitations still apply: restricted Chromium pages (`chrome://`, the
+  Web Store, PDF viewers) cannot be injected — the library opens instead; no
+  cross-device sync (backups are manual JSON files); only `http(s)` pages can
+  be saved.
+- This release does not change the local-only data model: the vault is stored
+  unencrypted in IndexedDB inside your browser profile — there is no password,
+  encryption layer, account or server component.
 
-**SHA-256:** see `release/CofreTabs-v1.1.0.json`, generated at packaging time.
+**SHA-256:** GitHub displays the ZIP's SHA-256 digest on this release page; the
+same hash is recorded in `release/CofreTabs-v1.1.0.json`, generated at
+packaging time.

@@ -38,7 +38,7 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 **Current version:** `1.1.0`
 
-**Browser compatibility:** Chrome 109+, Microsoft Edge, Brave, Vivaldi, and Opera (Chromium-based browsers supporting Manifest V3).
+**Browser compatibility:** Chrome 102+, Microsoft Edge 102+, Brave, Vivaldi, and Opera (Chromium-based browsers supporting Manifest V3).
 
 *Browser compatibility does not mean the extension is available in each browser's official add-on store.*
 
@@ -86,23 +86,61 @@ Your support helps keep independent development, testing, documentation, and fut
 
 ## 🖥️ Take a Look Inside
 
-The screenshots below were captured in Chrome using the actual panel and library code with a local fixture page and demo data. No personal browsing data is shown. See [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture details.
-
-### The library
-
-![CofreTabs library with demo tabs](docs/screenshots/library.png)
+The screenshots below were captured from the real v1.1.0 build in Chrome, using the actual panel and library code with a local fixture page and demo data. No personal browsing data is shown. See [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture details.
 
 ### The save panel
 
-Review the current page before deciding whether to save it.
+Review the current page — title, host, automatic folder and the 3×3 folder grid — before deciding whether to save it.
 
-![CofreTabs slide-over panel on a local test page](docs/screenshots/panel.png)
+![CofreTabs v1.1.0 slide-over save panel with the folder grid](docs/screenshots/panel-v1.1.0.png)
 
 ### Save confirmed
 
 The success state appears after the local database confirms the write.
 
-![CofreTabs panel showing a saved state](docs/screenshots/panel-saved.png)
+![CofreTabs v1.1.0 panel showing an acknowledged save](docs/screenshots/panel-saved-v1.1.0.png)
+
+### The library — dark theme
+
+Favorites, custom folders, saved tabs with notes, MOVE controls and the theme switch.
+
+![CofreTabs v1.1.0 library in the dark theme](docs/screenshots/library-v1.1.0.png)
+
+### The library — light theme
+
+The same vault in the light theme — the switch persists across launches and defaults to your system preference.
+
+![CofreTabs v1.1.0 library in the light theme](docs/screenshots/library-light-v1.1.0.png)
+
+### The panel in the light theme
+
+![CofreTabs v1.1.0 save panel in the light theme](docs/screenshots/panel-light-v1.1.0.png)
+
+### Favorites
+
+Heart any saved tab to collect it in the Favorites view — favoriting is a tag, the tab stays in its folder.
+
+![CofreTabs v1.1.0 Favorites view](docs/screenshots/favorites-v1.1.0.png)
+
+### Search
+
+Search matches title, URL, hostname, folder and notes.
+
+![CofreTabs v1.1.0 library search results](docs/screenshots/search-v1.1.0.png)
+
+### Trash
+
+Restore a trashed tab, delete it forever, or empty the Trash.
+
+![CofreTabs v1.1.0 Trash view](docs/screenshots/trash-v1.1.0.png)
+
+### Backup import
+
+The import dialog validates the whole file and previews it before you choose merge or replace mode.
+
+![CofreTabs v1.1.0 backup import dialog](docs/screenshots/import-v1.1.0.png)
+
+> The original v1.0.0 captures are kept alongside these in [`docs/screenshots/`](docs/screenshots/) (`panel.png`, `panel-saved.png`, `library.png`).
 
 ---
 
@@ -258,7 +296,7 @@ See [Why these permissions?](#-privacy) for the explanation of each permission.
 
 ## 📥 Installation
 
-CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 109+ · Edge · Brave · Vivaldi · Opera**.
+CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 102+ · Edge 102+ · Brave · Vivaldi · Opera**.
 
 ### Requirements
 
