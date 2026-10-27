@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CofreTabs — 30s Trailer (frame renderer)</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  canvas { display: block; width: 1920px; height: 1080px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/* ===========================================================================
+   CofreTabs 30s synthwave trailer — deterministic frame renderer.
+   Everything is a pure function of t (seconds). The capture driver calls
+   window.__seek(t) then screenshots the canvas. No timers, no Math.random().
+   Beat grid: 96 BPM — beat = 0.625s, bar = 2.5s. Scene cuts are beat-locked
+   to docs/trailer/make-audio.mjs.
+   =========================================================================== */
+const W = 1920, H = 1080, FR = 30
+const cv = document.getElementById('c')
+const ctx = cv.getContext('2d', { alpha: false })
+
+const DISPLAY = '"Arial Black", "Segoe UI", sans-serif'
+const MONO = 'Consolas, "Courier New", monospace'
+
+const LEMON = '#d9ff3d'
+const GREEN = '#29ffa8'
+const MAGENTA = '#ff2d95'
+const CYAN = '#16e0ff'
+const DIM = '#8fa07a'
+
+// --- assets -----------------------------------------------------------------
+const SRC = { panel: 'assets/panel.png', library: 'assets/library.png', light: 'assets/panel-light.png' }
+const imgs = {}
+const imgPromises = Object.entries(SRC).map(([k, s]) => new Promise((res, rej) => {
+  const im = new Image()
+  im.onload = () => { imgs[k] = im; res() }
+  im.onerror = () => rej(new Error('image failed: ' + s))
+  im.src = s
+}))
+
+// --- deterministic prng -----------------------------------------------------
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+let R = mulberry32(1)
+const seedFrame = (t) => { R = mulberry32((Math.round(t * FR) * 2654435761) >>> 0) }
+
+const clamp01 = (x) => Math.max(0, Math.min(1, x))
+const easeOut = (p) => 1 - Math.pow(1 - clamp01(p), 3)
+function easeOutBack(p) {
+  p = clamp01(p); const c = 1.9
+  return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2)
+}
+
+// --- text helpers -----------------------------------------------------------
+function neonText(txt, x, y, px, o = {}) {
+  const {
+    color = LEMON, glow = color, font = DISPLAY, align = 'center', weight = 900,
+    alpha = 1, sc = 1, chroma = 0, blur = 40, ls = 0, rot = 0,
+  } = o
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.translate(x, y)
+  if (rot) ctx.rotate(rot)
+  ctx.scale(sc, sc)
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.font = `${weight} ${px}px ${font}`
+  if (ls) ctx.letterSpacing = `${ls}px`
+  if (chroma > 0.5) {
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.shadowBlur = 0
+    ctx.fillStyle = 'rgba(255,45,149,0.85)'; ctx.fillText(txt, -chroma, 0)
+    ctx.fillStyle = 'rgba(22,224,255,0.85)'; ctx.fillText(txt, chroma, 0)
+    ctx.globalCompositeOperation = 'source-over'
+  }
+  ctx.shadowColor = glow
+  ctx.shadowBlur = blur
+  ctx.fillStyle = color
+  ctx.fillText(txt, 0, 0)
+  ctx.fillText(txt, 0, 0)
+  ctx.shadowBlur = 0
+  ctx.fillStyle = color
+  ctx.fillText(txt, 0, 0)
+  ctx.restore()
+}
+
+function monoLabel(txt, x, y, px, o = {}) {
+  const { color = GREEN, align = 'center', alpha = 1, ls = px * 0.22, weight = 700 } = o
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.font = `${weight} ${px}px ${MONO}`
+  ctx.letterSpacing = `${ls}px`
+  ctx.fillStyle = color
+  ctx.shadowColor = color
+  ctx.shadowBlur = 18
+  ctx.fillText(txt, x, y)
+  ctx.shadowBlur = 0
+  ctx.restore()
+}
+
+// --- world ------------------------------------------------------------------
+const HORIZON = 660
+const stars = (() => {
+  const r = mulberry32(77)
+  return Array.from({ length: 150 }, () => ({
+    x: r() * W, y: r() * (HORIZON - 40), s: 1 + r() * 2.4,
+    ph: r() * Math.PI * 2, sp: 1.5 + r() * 3.5,
+  }))
+})()
+const mtn = (() => {
+  const r = mulberry32(913)
+  const mk = (base, amp, step) => {
+    const pts = [[-100, HORIZON]]
+    let x = -100
+    while (x < W + 100) {
+      x += step * (0.5 + r())
+      pts.push([x, base - amp * (0.25 + r())])
+    }
+    pts.push([W + 100, HORIZON])
+    return pts
+  }
+  return { far: mk(HORIZON + 6, 150, 130), near: mk(HORIZON + 14, 95, 90) }
+})()
+
+function drawSky(t, dim) {
+  const g = ctx.createLinearGradient(0, 0, 0, HORIZON + 60)
+  g.addColorStop(0, '#07030f')
+  g.addColorStop(0.55, '#150a2e')
+  g.addColorStop(1, '#3a1150')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, W, HORIZON + 70)
+  if (dim > 0) { ctx.fillStyle = `rgba(4,2,10,${dim})`; ctx.fillRect(0, 0, W, HORIZON + 70) }
+}
+
+function drawStars(t) {
+  for (const s of stars) {
+    const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph))
+    // fade stars behind the sun
+    const dx = s.x - 960, dy = s.y - (HORIZON - 210)
+    const inSun = Math.sqrt(dx * dx + dy * dy) < 250
+    ctx.fillStyle = `rgba(255,255,255,${(inSun ? 0.08 : 0.75) * a})`
+    ctx.fillRect(s.x, s.y, s.s, s.s)
+  }
+}
+
+function drawSun(t) {
+  const cx = 960, cy = HORIZON - 205, r = 235
+  const bob = Math.sin(t * 0.7) * 6
+  const glow = ctx.createRadialGradient(cx, cy + bob, r * 0.4, cx, cy + bob, r * 2.1)
+  glow.addColorStop(0, 'rgba(255,110,60,0.5)')
+  glow.addColorStop(1, 'rgba(255,110,60,0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(cx - r * 2.2, cy + bob - r * 2.2, r * 4.4, r * 4.4)
+
+  const g = ctx.createLinearGradient(0, cy + bob - r, 0, cy + bob + r)
+  g.addColorStop(0, '#ffe14d')
+  g.addColorStop(0.45, '#ff9a3c')
+  g.addColorStop(1, '#ff2d95')
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(cx, cy + bob, r, 0, Math.PI * 2)
+  ctx.clip()
+  ctx.fillStyle = g
+  ctx.fillRect(cx - r, cy + bob - r, r * 2, r * 2)
+  // retro stripes: gap+bar grow towards the bottom, slowly scrolling
+  ctx.fillStyle = '#0c0520'
+  const off = (t * 26) % 46
+  for (let i = 0; i < 9; i++) {
+    const y = cy + bob + 10 + i * i * 5.4 + off * (0.35 + i * 0.12)
+    const h = 4 + i * 3.6
+    if (y < cy + bob + r) ctx.fillRect(cx - r, y, r * 2, h)
+  }
+  ctx.restore()
+  ctx.strokeStyle = 'rgba(255,225,77,0.9)'
+  ctx.lineWidth = 3
+  ctx.beginPath(); ctx.arc(cx, cy + bob, r, 0, Math.PI * 2); ctx.stroke()
+}
+
+function drawMountains() {
+  const poly = (pts, fill) => {
+    ctx.fillStyle = fill
+    ctx.beginPath()
+    ctx.moveTo(pts[0][0], pts[0][1])
+    for (const [x, y] of pts) ctx.lineTo(x, y)
+    ctx.closePath(); ctx.fill()
+  }
+  poly(mtn.far, '#241046')
+  poly(mtn.near, '#140726')
+}
+
+function drawGrid(t) {
+  ctx.save()
+  ctx.strokeStyle = 'rgba(255,45,149,0.55)'
+  ctx.lineWidth = 2
+  ctx.shadowColor = MAGENTA
+  ctx.shadowBlur = 10
+  const speed = 0.35
+  const N = 26
+  for (let i = 0; i < N; i++) {
+    const p = (i + ((t * speed) % 1)) / N
+    const y = HORIZON + (H - HORIZON + 40) * Math.pow(p, 2.6)
+    ctx.globalAlpha = 0.25 + 0.75 * p
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+  }
+  ctx.globalAlpha = 0.5
+  ctx.strokeStyle = 'rgba(22,224,255,0.4)'
+  ctx.shadowColor = CYAN
+  for (let vx = -14; vx <= 14; vx++) {
+    const bx = W / 2 + vx * 155
+    ctx.beginPath(); ctx.moveTo(W / 2, HORIZON); ctx.lineTo(bx, H + 30); ctx.stroke()
+  }
+  ctx.restore()
+}
+
+function drawWorld(t, dim, pump) {
+  ctx.save()
+  ctx.translate(W / 2, H / 2)
+  ctx.scale(pump, pump)
+  ctx.translate(-W / 2, -H / 2)
+  drawSky(t, dim)
+  drawStars(t)
+  drawSun(t)
+  drawMountains()
+  drawGrid(t)
+  ctx.restore()
+  // floor base
+  ctx.fillStyle = '#050210'
+  ctx.fillRect(0, HORIZON + 2, W, 0) // (grid already covers; keeps horizon crisp)
+}
+
+// --- screenshot presentation ------------------------------------------------
+function shot(key, url, x, y, w, o = {}) {
+  const { rot = 0, alpha = 1, sc = 1, hueGlow = LEMON } = o
+  const im = imgs[key]
+  if (!im) return
+  const iw = w, ih = w * (im.height / im.width)
+  const bar = 46
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.translate(x + iw / 2, y + (ih + bar) / 2)
+  ctx.rotate(rot)
+  ctx.scale(sc, sc)
+  ctx.translate(-iw / 2, -(ih + bar) / 2)
+  // window body
+  ctx.fillStyle = '#0b0818'
+  ctx.fillRect(0, 0, iw, ih + bar)
+  ctx.save()
+  ctx.beginPath(); ctx.rect(0, bar, iw, ih); ctx.clip()
+  ctx.drawImage(im, 0, bar, iw, ih)
+  ctx.restore()
+  // chrome bar
+  ctx.fillStyle = '#120d28'
+  ctx.fillRect(0, 0, iw, bar)
+  const dot = (dx, c) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(dx, bar / 2, 7, 0, Math.PI * 2); ctx.fill() }
+  dot(24, '#ff5f57'); dot(46, '#febc2e'); dot(68, '#28c840')
+  ctx.font = `400 20px ${MONO}`
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#9aa8c0'
+  ctx.fillText(url, 92, bar / 2 + 1)
+  // neon border + corner brackets
+  ctx.strokeStyle = hueGlow
+  ctx.lineWidth = 3
+  ctx.shadowColor = hueGlow
+  ctx.shadowBlur = 26
+  ctx.strokeRect(0, 0, iw, ih + bar)
+  ctx.shadowBlur = 0
+  ctx.lineWidth = 6
+  const B = 34
+  const corners = [[0, 0, 1, 1], [iw, 0, -1, 1], [0, ih + bar, 1, -1], [iw, ih + bar, -1, -1]]
+  for (const [cx, cy, sx, sy] of corners) {
+    ctx.beginPath()
+    ctx.moveTo(cx + sx * B, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy * B)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
+function chip(txt, x, y, ts, t, o = {}) {
+  const p = (t - ts) / 0.28
+  if (p <= 0) return
+  const a = clamp01(p * 2.5), sc = 0.7 + 0.3 * easeOutBack(Math.min(p, 1))
+  const px = o.px || 34
+  ctx.save()
+  ctx.font = `700 ${px}px ${MONO}`
+  const w = ctx.measureText(txt).width + px * 1.6
+  const h = px * 2.1
+  ctx.globalAlpha = a
+  ctx.translate(x, y)
+  ctx.scale(sc, sc)
+  ctx.fillStyle = 'rgba(8,4,18,0.88)'
+  ctx.strokeStyle = o.border || LEMON
+  ctx.lineWidth = 3
+  ctx.shadowColor = o.border || LEMON
+  ctx.shadowBlur = 20
+  ctx.fillRect(-w / 2, -h / 2, w, h)
+  ctx.strokeRect(-w / 2, -h / 2, w, h)
+  ctx.shadowBlur = 0
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = o.color || LEMON
+  ctx.fillText(txt, 0, 2)
+  ctx.restore()
+}
+
+// --- scene timeline ---------------------------------------------------------
+const CUTS = [0.625, 5.0, 7.5, 10.0, 15.0, 17.5, 20.0, 22.5, 25.0]
+const FLASHES = [5.0, 25.0]
+
+function dimFor(t) {
+  if (t < 0.625) return 0.85
+  if (t < 5.0) return 0.42
+  if (t < 7.5) return 0.3
+  if (t < 10.0) return 0.24
+  if (t < 15.0) return 0.2
+  if (t < 17.5) return 0.34
+  if (t < 20.0) return 0.2
+  if (t < 22.5) return 0.55
+  if (t < 25.0) return 0.42
+  return 0.3
+}
+
+function punchIn(t, ts) {
+  return { a: clamp01((t - ts) * 9), s: 1 + 0.22 * (1 - easeOutBack((t - ts) / 0.34)) }
+}
+
+function sceneText(t) {
+  // -- intro card --
+  if (t < 0.625) {
+    const a = clamp01(t * 3.5)
+    monoLabel('MADWOLF STUDIOS', 960, 540, 44, { color: DIM, alpha: a * 0.9, ls: 16 })
+    return
+  }
+
+  // -- tagline stack (beats 2/4/6) --
+  if (t < 4.375) {
+    const lines = [
+      ['YOUR TABS.', 0.625, 330],
+      ['YOUR VAULT.', 1.875, 540],
+      ['YOUR DEVICE.', 3.125, 750],
+    ]
+    for (const [txt, ts, y] of lines) {
+      if (t < ts) continue
+      const { a, s } = punchIn(t, ts)
+      const ch = Math.max(0, 18 - (t - ts) * 120)
+      neonText(txt, 960, y, 132, { alpha: a, sc: s, chroma: ch, blur: 46 })
+    }
+    return
+  }
+
+  // -- zoom-out transition --
+  if (t < 5.0) {
+    const p = (t - 4.375) / 0.625
+    const sc = 1 + p * p * 1.8
+    const a = 1 - p * p
+    for (const [txt, , y] of [
+      ['YOUR TABS.', 0, 330], ['YOUR VAULT.', 0, 540], ['YOUR DEVICE.', 0, 750],
+    ]) {
+      neonText(txt, 960, y, 132, { alpha: a, sc, chroma: 6 + p * 30, blur: 46 })
+    }
+    return
+  }
+
+  // -- drop titles --
+  if (t < 6.25) {
+    const { a, s } = punchIn(t, 5.0)
+    neonText('47 TABS OPEN.', 960, 500, 168, { alpha: a, sc: s, chroma: Math.max(0, 26 - (t - 5) * 160), blur: 52 })
+    monoLabel('SOUND FAMILIAR?', 960, 660, 40, { color: GREEN, alpha: clamp01((t - 5.4) * 3), ls: 12 })
+    return
+  }
+  if (t < 7.5) {
+    const p = clamp01((t - 6.25) / 0.1)
+    const { a, s } = punchIn(t, 6.25)
+    neonText('ZERO LOST.', 960, 540, 205, { alpha: a * (1 - Math.pow(p, 6) * 0), sc: s, chroma: Math.max(0, 30 - (t - 6.25) * 190), blur: 60, color: GREEN, glow: GREEN })
+    return
+  }
+
+  // -- SHOT 1: save panel --
+  if (t < 10.0) {
+    const p = easeOut((t - 7.5) / 0.45)
+    const x = 1035 + (1 - p) * 420
+    monoLabel('// ONE CLICK', 90, 300, 40, { align: 'left', alpha: p, ls: 14 })
+    neonText('> SAVE THIS TAB _', 90, 420, 74, { align: 'left', alpha: p, chroma: Math.max(0, 14 - (t - 7.5) * 90), blur: 30 })
+    ctx.save()
+    ctx.globalAlpha = clamp01((t - 7.8) * 3)
+    ctx.font = `700 30px ${MONO}`
+    ctx.letterSpacing = '4px'
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = DIM
+    ctx.fillText('NOTHING LEAVES YOUR DEVICE.', 90, 530)
+    ctx.restore()
+    shot('panel', 'boring.tools/field-notes/…', x, 145, 810, { rot: 0.014, sc: 0.97 + 0.03 * p })
+    return
+  }
+
+  // -- SHOT 2: full library + feature chips --
+  if (t < 15.0) {
+    const p = easeOut((t - 10.0) / 0.45)
+    neonText('THE FULL VAULT', 960, 92, 84, { alpha: p, chroma: Math.max(0, 16 - (t - 10) * 100), blur: 34 })
+    shot('library', 'chrome-extension://cofretabs/library.html', 495, 175, 930, {
+      rot: -0.008, sc: 0.97 + 0.03 * p,
+    })
+    chip('★ FAVORITES', 265, 430, 11.25, t)
+    chip('CUSTOM FOLDERS', 245, 640, 12.5, t, { border: GREEN, color: GREEN })
+    chip('NOTES ON TABS', 1665, 430, 13.0, t, { border: CYAN, color: CYAN })
+    chip('TRASH', 1665, 640, 13.75, t)
+    return
+  }
+
+  // -- local statement --
+  if (t < 17.5) {
+    const { a, s } = punchIn(t, 15.0)
+    neonText('100% LOCAL', 960, 450, 205, { alpha: a, sc: s, chroma: Math.max(0, 24 - (t - 15) * 150), blur: 56 })
+    monoLabel('NO CLOUD · NO ACCOUNT · NO TRACKING', 960, 640, 46, {
+      color: GREEN, alpha: clamp01((t - 16.1) * 3.5), ls: 12, px: 46,
+    })
+    return
+  }
+
+  // -- SHOT 3: light theme --
+  if (t < 20.0) {
+    const p = easeOut((t - 17.5) / 0.45)
+    const x = 75 - (1 - p) * 420
+    shot('light', 'boring.tools/field-notes/…', x, 145, 810, { rot: -0.014, sc: 0.97 + 0.03 * p, hueGlow: GREEN })
+    monoLabel('// EASY ON THE EYES', 980, 320, 40, { align: 'left', alpha: p, ls: 14 })
+    neonText('DARK & LIGHT', 980, 440, 92, { align: 'left', alpha: p, chroma: Math.max(0, 14 - (t - 17.5) * 90), blur: 32 })
+    neonText('THEMES', 980, 560, 92, { align: 'left', alpha: clamp01((t - 17.75) * 5), chroma: Math.max(0, 14 - (t - 17.75) * 90), blur: 32, color: GREEN, glow: GREEN })
+    ctx.save()
+    ctx.globalAlpha = clamp01((t - 18.1) * 3)
+    ctx.font = `700 30px ${MONO}`
+    ctx.letterSpacing = '4px'
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = DIM
+    ctx.fillText('v1.1.0 SHIPS BOTH.', 980, 670)
+    ctx.restore()
+    return
+  }
+
+  // -- open source (breakdown) --
+  if (t < 22.5) {
+    const p = (t - 20.0) / 2.5
+    const { a } = punchIn(t, 20.0)
+    neonText('OPEN SOURCE', 960, 450, 168, { alpha: a, sc: 1 + p * 0.06, chroma: Math.max(0, 16 - (t - 20) * 100), blur: 50 })
+    monoLabel('MIT LICENSE · AUDIT THE CODE', 960, 620, 44, { color: GREEN, alpha: clamp01((t - 21.1) * 3), ls: 12, px: 44 })
+    return
+  }
+
+  // -- free (build) --
+  if (t < 25.0) {
+    const { a, s } = punchIn(t, 22.5)
+    neonText('FREE.', 960, 430, 300, { alpha: a, sc: s, chroma: Math.max(0, 34 - (t - 22.5) * 190), blur: 70 })
+    neonText('& OPEN SOURCE.', 960, 660, 150, { alpha: clamp01((t - 23.6) * 6), sc: 1 + 0.16 * (1 - easeOutBack(clamp01((t - 23.6) / 0.34))), chroma: Math.max(0, 22 - (t - 23.6) * 120), blur: 48, color: GREEN, glow: GREEN })
+    return
+  }
+
+  // -- final card --
+  const ch = Math.max(0, 30 - (t - 25) * 160)
+  const { a, s } = punchIn(t, 25.0)
+  neonText('COFRETABS', 960, 355, 196, { alpha: a, sc: s, chroma: ch, blur: 64, ls: 6 })
+  monoLabel('YOUR TABS. YOUR VAULT. YOUR DEVICE.', 960, 505, 40, { color: GREEN, alpha: clamp01((t - 25.85) * 4), ls: 9, px: 40 })
+  // CTA pill
+  const cp = clamp01((t - 26.7) * 4)
+  if (cp > 0) {
+    const sc2 = 0.85 + 0.15 * easeOutBack(clamp01((t - 26.7) / 0.3))
+    ctx.save()
+    ctx.globalAlpha = cp
+    ctx.translate(960, 660)
+    ctx.scale(sc2, sc2)
+    ctx.font = `900 56px ${DISPLAY}`
+    const label = 'INSTALL FREE ↗'
+    const w = ctx.measureText(label).width + 130
+    ctx.fillStyle = 'rgba(8,4,18,0.9)'
+    ctx.strokeStyle = LEMON
+    ctx.lineWidth = 4
+    ctx.shadowColor = LEMON
+    ctx.shadowBlur = 30
+    ctx.fillRect(-w / 2, -52, w, 104)
+    ctx.strokeRect(-w / 2, -52, w, 104)
+    ctx.shadowBlur = 24
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = LEMON
+    ctx.fillText(label, 0, 4)
+    ctx.restore()
+    monoLabel('github.com/MadalinWolf/CofreTabs', 960, 760, 44, { color: LEMON, alpha: cp, ls: 6, px: 44 })
+  }
+  monoLabel('CHROME 102+ · EDGE · BRAVE · VIVALDI · OPERA', 960, 875, 33, { color: DIM, alpha: clamp01((t - 27.5) * 4), ls: 8, px: 33 })
+  chip('[ FREE & OPEN SOURCE · MIT ]', 960, 960, 28.25, t, { border: GREEN, color: GREEN, px: 36 })
+  monoLabel('MADWOLF STUDIOS', 960, 1032, 24, { color: DIM, alpha: clamp01((t - 27.9) * 3), ls: 14, px: 24 })
+}
+
+// --- overlays ---------------------------------------------------------------
+function overlays(t) {
+  // cut flashes
+  for (const f of FLASHES) {
+    const d = t - f
+    if (d >= 0 && d < 0.14) {
+      ctx.fillStyle = `rgba(217,255,61,${0.75 * (1 - d / 0.14)})`
+      ctx.fillRect(0, 0, W, H)
+    }
+  }
+  // scanlines
+  ctx.fillStyle = 'rgba(0,0,0,0.16)'
+  for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1)
+  // grain
+  const n = 420
+  for (let i = 0; i < n; i++) {
+    const x = R() * W, y = R() * H, s = 1 + R() * 2.6
+    ctx.fillStyle = `rgba(255,255,255,${R() * 0.05})`
+    ctx.fillRect(x, y, s, s)
+  }
+  // vignette
+  const v = ctx.createRadialGradient(960, 540, 360, 960, 540, 1180)
+  v.addColorStop(0, 'rgba(0,0,0,0)')
+  v.addColorStop(1, 'rgba(0,0,0,0.62)')
+  ctx.fillStyle = v
+  ctx.fillRect(0, 0, W, H)
+  // end fade
+  if (t > 29.5) {
+    ctx.fillStyle = `rgba(0,0,0,${clamp01((t - 29.5) / 0.5)})`
+    ctx.fillRect(0, 0, W, H)
+  }
+}
+
+function glitchAmount(t) {
+  for (const c of CUTS) {
+    const d = t - c
+    if (d >= 0 && d < 0.16) return 1 - d / 0.16
+  }
+  if (t >= 24.55 && t < 25.0) return 0.35 + 0.65 * ((t - 24.55) / 0.45)
+  if (t >= 4.25 && t < 4.4) return 0.5
+  return 0
+}
+
+function glitchTear(amount) {
+  if (amount <= 0.01) return
+  const n = Math.round(3 + amount * 9)
+  for (let i = 0; i < n; i++) {
+    const sy = R() * H
+    const sh = 6 + R() * 70 * amount
+    const dx = (R() * 2 - 1) * 160 * amount
+    ctx.drawImage(cv, 0, sy, W, sh, dx, sy, W, sh)
+  }
+}
+
+// --- main -------------------------------------------------------------------
+function draw(t) {
+  seedFrame(t)
+  ctx.globalAlpha = 1
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(0, 0, W, H)
+
+  const groove = (t >= 5 && t < 20) || (t >= 25 && t < 29)
+  const phase = (t % 0.625) / 0.625
+  const pump = groove ? 1 + 0.011 * Math.exp(-phase * 6) : 1
+
+  drawWorld(t, dimFor(t), pump)
+  sceneText(t)
+  overlays(t)
+  glitchTear(glitchAmount(t))
+}
+
+// capture driver contract
+window.__seek = (t) => { draw(t); return true }
+window.__ready = Promise.all(imgPromises).then(() => { draw(0); return true })
+draw(0)
+</script>
+</body>
+</html>

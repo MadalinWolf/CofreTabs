@@ -1,0 +1,4 @@
+# scratch artifacts of the trailer pipeline (regenerate with the scripts)
+frames/
+frames-smoke/
+check-*.jpg
