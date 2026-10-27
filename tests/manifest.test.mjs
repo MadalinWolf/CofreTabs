@@ -82,7 +82,8 @@ test('release documentation and privacy page are present without fake donation l
   }
 
   const readme = await readFile(join(ROOT, 'README.md'), 'utf8');
-  assert.match(readme, /TODO: ADD DONATION LINK/);
+  assert.match(readme, /https:\/\/github\.com\/sponsors\/MadalinWolf/);
+  assert.doesNotMatch(readme, /TODO: ADD DONATION LINK/);
   assert.match(readme, /Your tabs\. Your vault\. Your device\./);
   assert.doesNotMatch(readme, /https:\/\/github\.com\/MadalinWolf\/CofreTabs\/releases\/download/);
 });

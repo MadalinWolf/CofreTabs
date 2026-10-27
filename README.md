@@ -31,10 +31,9 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 |:--|:--|:--|
 | 🌐 Chrome Web Store | Not submitted or published | Coming soon |
 | 🟦 Microsoft Edge Add-ons | Not published | Coming soon |
-| 🦊 Firefox Add-ons | Not listed | Coming soon |
-| 🔴 Opera Add-ons | Not listed | Coming soon |
-| 🦁 Brave Browser | Manual installation | [Installation instructions](#-installation) |
 | 💾 GitHub Releases | ✅ v1.1.0 Published | [View Release & Downloads](https://github.com/MadalinWolf/CofreTabs/releases/latest) |
+
+**CofreTabs is free — every download, every store, forever.** If it saves you time, you can support development below — pay what you want, get nothing extra, keep the app either way.
 
 **Current version:** `1.1.0`
 
@@ -48,7 +47,7 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 ## ❤️ Support Independent Development
 
-CofreTabs is an independent project from **MadWolf Studios**. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development makes a difference.
+CofreTabs is an independent project from **MadWolf Studios**, and it is **free everywhere** — GitHub, and every store it lands in. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development with a pay-what-you-want donation makes a difference — but the app never charges and donors never get extra features.
 
 | Support | Link |
 |:--|:--|
@@ -69,7 +68,6 @@ Your support helps keep independent development, testing, documentation, and fut
 
 *GitHub Sponsors is the configured support destination listed here. Ko-fi, itch.io, and Gumroad are planned, not active payment links.*
 
-<!-- TODO: ADD DONATION LINK -->
 ---
 
 ## 🔗 Official Links
@@ -434,10 +432,9 @@ That's the declared permission list. The service worker uses the browser's tab A
 |:--|:--|
 | Source repository | ✅ Public |
 | Current version | `1.1.0` |
+| Price | ✅ Free (donations optional) |
 | Chrome Web Store | Not published |
 | Microsoft Edge Add-ons | Not published |
-| Firefox Add-ons | Not listed |
-| Opera Add-ons | Not listed |
 | GitHub Releases | ✅ [CofreTabs v1.1.0 — View release](https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0) |
 
 Store listing copy and submission preparation are documented in [`docs/STORE.md`](docs/STORE.md) and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).

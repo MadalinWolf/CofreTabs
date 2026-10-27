@@ -17,7 +17,7 @@ Web Store.
 | Chrome Web Store submission | **Not started** |
 | GitHub publication | **Not performed** (no auth/CLI in build environment) |
 | Website deployment | **Not performed** (static package only) |
-| Donation URL | **Missing** (`TODO: ADD DONATION LINK`) |
+| Donation URL | ✅ Configured — <https://github.com/sponsors/MadalinWolf> |
 
 ## Before submitting
 
@@ -28,8 +28,9 @@ Web Store.
 4. Verify the privacy policy URL is live if you provide one. The bundled page is
    also reachable from the library footer.
 5. Create a public support/contact URL or use <https://madwolfstudios.com/>.
-6. Decide the donation URL. Replace `TODO: ADD DONATION LINK` everywhere only
-   with a verified destination.
+6. Donation URL is configured as GitHub Sponsors
+   (<https://github.com/sponsors/MadalinWolf>). If it ever changes, replace it
+   everywhere only with a verified destination.
 7. Make the GitHub repository public and confirm the README has no dead release
    links.
 8. Build the final ZIP from a clean checkout:

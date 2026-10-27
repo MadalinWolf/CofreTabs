@@ -44,11 +44,10 @@ Example with GitHub Pages after the repository is public:
 
 ## Before publishing
 
-- [ ] Replace `TODO: ADD DONATION LINK` with a verified donation URL, or remove
-      the donation line entirely.
-- [ ] Confirm `https://github.com/MadalinWolf/CofreTabs` exists and is public;
-      the current links point to the owner profile because the repo is not
-      published yet.
+- [x] Donation URL configured: <https://github.com/sponsors/MadalinWolf>
+      (pay what you want; Ko-fi, itch.io and Gumroad still planned).
+- [x] Confirm `https://github.com/MadalinWolf/CofreTabs` exists and is public —
+      it is published; the release link points at the real v1.1.0 release.
 - [ ] Confirm the release status copy is still accurate. If the extension is
       published, update the "not yet" language and install instructions.
 - [ ] Capture and add real screenshots if desired; the current page uses a CSS

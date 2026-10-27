@@ -121,4 +121,4 @@ Do not use any of these until they are true:
 - "Encrypted vault" (it is not encrypted)
 - "Blocks trackers" (it is a vault, not a blocker)
 - "Works in Firefox/Safari" (not tested/supported)
-- Any donation URL (still `TODO: ADD DONATION LINK`)
+- Ko-fi, itch.io or Gumroad donation URLs (planned; only GitHub Sponsors is live)

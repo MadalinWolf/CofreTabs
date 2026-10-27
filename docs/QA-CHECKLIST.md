@@ -135,8 +135,8 @@ Spot-check in the library after saving:
       `sha256sum`.
 - [ ] Store screenshots are current and contain no personal data.
 - [ ] Store privacy answers match `docs/PRIVACY.md`.
-- [ ] Donation link is either verified and configured, or clearly absent
-      (`TODO: ADD DONATION LINK`).
+- [ ] Donation link is verified and configured
+      (<https://github.com/sponsors/MadalinWolf>).
 - [ ] GitHub repository, website and store URLs in docs are real before claiming
       a release.
 
