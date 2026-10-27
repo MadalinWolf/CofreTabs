@@ -101,5 +101,5 @@ No changes yet.
 - Donation URL not configured (`TODO: ADD DONATION LINK`).
 
 [Unreleased]: https://github.com/MadalinWolf/CofreTabs/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/MadalinWolf/CofreTabs/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.0.0
+[1.1.0]: https://github.com/MadalinWolf/CofreTabs/compare/49958da6d0c971ea819c034650cf3a5d2caebfde...v1.1.0
+[1.0.0]: https://github.com/MadalinWolf/CofreTabs/tree/49958da6d0c971ea819c034650cf3a5d2caebfde
