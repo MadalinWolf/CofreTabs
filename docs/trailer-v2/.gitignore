@@ -3,6 +3,7 @@ frames/
 frames-smoke/
 rendered/
 review/
+music-options/
 *.png
 
 # superseded iteration scripts, kept locally only

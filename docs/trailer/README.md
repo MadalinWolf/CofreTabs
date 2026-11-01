@@ -10,7 +10,7 @@ plus the source footage in `../trailer-v2/clips/` (committed).
 |:--|:--|
 | `cofretabs-trailer-1080p30.mp4` | H.264 + AAC, 1920×1080, 30fps, 30.0s — primary upload (stores, YouTube, X/Reddit) |
 | `cofretabs-trailer-1080p30.webm` | VP9 + Opus, same timing — for listings that want WebM |
-| `../trailer-v2/trailer.wav` | The synthwave bed (128 BPM, D minor, beat-locked to the scenes) |
+| `../trailer-v2/trailer.wav` | The synthwave bed (128 BPM, F major retrowave anthem "Neon Horizon", beat-locked to the scenes) |
 
 ## How it works (v2 — real footage in Chrome)
 
@@ -25,10 +25,13 @@ All pipeline files live in `../trailer-v2/`.
    (`cdp.mjs`) while ffmpeg `gdigrab` records the 1920×1080 desktop region —
    all input goes through CDP, so nothing depends on OS window focus. Every
    scene has a post-condition check; failed scenes never ship.
-2. **Music** — `make-audio.mjs` synthesises the 30s bed from scratch (kick /
-   snare / hats, sidechained bass, pad, arp lead, risers, crashes, whips) →
-   `trailer.wav`. 128 BPM → beat = 0.46875s; crashes land on beats 8/32/56
-   (3.75 / 15.0 / 26.25s).
+2. **Music** — `make-audio-options.mjs` synthesises three complete 30s
+   arrangements from scratch (darksynth / retrowave anthem / cyber techno) as
+   auditions; `make-audio.mjs` re-renders them and promotes the shipped pick —
+   option B "Neon Horizon" — to `trailer.wav`. 128 BPM → beat = 0.46875s;
+   crashes land on beats 8/32/56 (3.75 / 15.0 / 26.25s), theme-flip accent at
+   21.125s, whip whooshes at 13.594 / 20.625s — so every choice stays
+   beat-synced with the cut map.
 3. **Cut map** — `trailer.html` holds `const CUTS`: 22 entries, each pinned to
    a beat window and a footage second (`tIn`) chosen so key actions hit
    musical accents — library reveal on drop 2 at 15.0s, dark→light theme flip
@@ -56,7 +59,7 @@ ffmpeg -y -framerate 30 -i rendered\frame_%04d.jpg -i trailer.wav -af volume=-2d
 
 - ffprobe both files: ≈30.0s, 1920×1080, 30/1 fps, h264+aac / vp9+opus.
 - Full decode to null with no errors.
-- `volumedetect` on the audio: mean ≈ −12 dB, peak ≈ −0.4 dB.
+- `volumedetect` on the audio: mean ≈ −12 dB, peak ≤ 0 dB (soft-clipped master).
 - A 1fps contact sheet of the encoded MP4 reviewed frame by frame
   (`../trailer-v2/review/sheet30-*.jpg`).
 
