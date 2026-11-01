@@ -1,0 +1,96 @@
+﻿{
+    "fixId":  "A120C045EE7D00011D6B1EFCDA7408F0",
+    "chromeId":  "C9E54F862707F088BD3C23B0527A3730",
+    "rect":  {
+                 "Y":  -8,
+                 "W":  1936,
+                 "H":  1048,
+                 "X":  -8
+             },
+    "panel":  {
+                  "ok":  true,
+                  "search":  [
+                                 1696,
+                                 451
+                             ],
+                  "openLib":  [
+                                  1835,
+                                  419
+                              ],
+                  "heart1":  [
+                                 1840,
+                                 732
+                             ],
+                  "trashSO":  [
+                                  1867,
+                                  862
+                              ],
+                  "rows":  5,
+                  "vault":  15,
+                  "searchVal":  ""
+              },
+    "lib":  {
+                "ok":  true,
+                "navAll":  [
+                               136,
+                               114
+                           ],
+                "navFolders":  [
+                                   136,
+                                   176
+                               ],
+                "navTrash":  [
+                                 136,
+                                 207
+                             ],
+                "search":  [
+                               1253,
+                               53
+                           ],
+                "theme":  [
+                              223,
+                              713
+                          ],
+                "themeOpts":  [
+                                  "dark",
+                                  "light"
+                              ],
+                "themeAttr":  "dark",
+                "edit1":  [
+                              1582,
+                              154
+                          ],
+                "move1":  [
+                              1625,
+                              154
+                          ],
+                "editRows":  15,
+                "scrollH":  1518,
+                "clientH":  945,
+                "searchVal":  ""
+            },
+    "folders":  {
+                    "ok":  true,
+                    "githubCard":  [
+                                       1343,
+                                       179
+                                   ],
+                    "header":  true
+                },
+    "editor":  {
+                   "ok":  true,
+                   "note":  [
+                                955,
+                                574
+                            ],
+                   "save":  [
+                                1159,
+                                652
+                            ]
+               },
+    "pre":  {
+                "editRows":  15,
+                "folderId":  "folder_77465437-4ada-452f-bdc9-30096fbaf89a",
+                "rows":  5
+            }
+}

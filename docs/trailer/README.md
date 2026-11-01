@@ -1,7 +1,8 @@
 # CofreTabs — 30s trailer (synthwave)
 
 Deterministic trailer pipeline: every frame is a pure function of time, so the
-video is re-renderable byte-for-byte on any machine that has Chrome + ffmpeg.
+video is re-renderable byte-for-byte on any machine that has Chrome + ffmpeg
+plus the source footage in `../trailer-v2/clips/` (committed).
 
 ## Outputs
 
@@ -9,28 +10,55 @@ video is re-renderable byte-for-byte on any machine that has Chrome + ffmpeg.
 |:--|:--|
 | `cofretabs-trailer-1080p30.mp4` | H.264 + AAC, 1920×1080, 30fps, 30.0s — primary upload (stores, YouTube, X/Reddit) |
 | `cofretabs-trailer-1080p30.webm` | VP9 + Opus, same timing — for listings that want WebM |
-| `trailer.wav` | The synthwave bed (96 BPM, A minor, beat-locked to the scenes) |
+| `../trailer-v2/trailer.wav` | The synthwave bed (128 BPM, D minor, beat-locked to the scenes) |
 
-## How it works
+## How it works (v2 — real footage in Chrome)
 
-1. `make-audio.mjs` synthesises the 30s music bed from scratch (kick/snare/hats,
-   sidechained bass, pad, ping-pong arp lead, risers/impacts) → `trailer.wav`.
-   Beat = 0.625s, bar = 2.5s, 12 bars = exactly 30.0s.
-2. `trailer.html` renders any frame `t` on a canvas via `window.__seek(t)` —
-   retro sun, perspective grid, mountains, neon type, VHS scanlines/glitches,
-   and the three real screenshots from `assets/` (v1.1.0 UI captures).
-   Scene cuts sit on bar/beat boundaries, so visuals hit with the music.
-3. `capture-frames.mjs` drives headless Chrome over CDP: seeks 900 frames
-   (30fps) and screenshots each → `frames/frame_0000.jpg … frame_0899.jpg`.
-   `node capture-frames.mjs --smoke` captures 14 cue frames instead (fast QA).
-4. ffmpeg assembles frames + WAV:
+All pipeline files live in `../trailer-v2/`.
+
+1. **Footage** — `setup.mjs` builds a recording copy of the extension
+   (`CofreTabs-TRAILER`, patched with a keyboard command so the panel opens
+   deterministically; the repo is never touched). `prep3.ps1` measures the live
+   UI (panel / library / folder / editor coordinates → `coords3.json`) and
+   verifies every fragile interaction path before recording. Then
+   `record-retake3.ps1` + `record-retake3b.ps1` drive each scene over CDP
+   (`cdp.mjs`) while ffmpeg `gdigrab` records the 1920×1080 desktop region —
+   all input goes through CDP, so nothing depends on OS window focus. Every
+   scene has a post-condition check; failed scenes never ship.
+2. **Music** — `make-audio.mjs` synthesises the 30s bed from scratch (kick /
+   snare / hats, sidechained bass, pad, arp lead, risers, crashes, whips) →
+   `trailer.wav`. 128 BPM → beat = 0.46875s; crashes land on beats 8/32/56
+   (3.75 / 15.0 / 26.25s).
+3. **Cut map** — `trailer.html` holds `const CUTS`: 22 entries, each pinned to
+   a beat window and a footage second (`tIn`) chosen so key actions hit
+   musical accents — library reveal on drop 2 at 15.0s, dark→light theme flip
+   on the light crash at 21.125s, trash-restore toast before drop 3. CMD-style
+   text overlays, zoom punches, whip pans, glitches and flashes all derive
+   from the same beat map.
+4. **Render** — `extract-frames.mjs` parses `CUTS` and pulls the exact footage
+   windows into `frames/<id>/fNNNN.jpg` (+ `frames/manifest.js`);
+   `capture-frames.mjs` drives headless Chrome over CDP, seeks
+   `window.__seek(t)` to each of 900 frames (30fps × 30s) and screenshots it
+   into `rendered/`.
+5. **Encode** — ffmpeg assembles frames + WAV:
 
 ```powershell
-ffmpeg -y -framerate 30 -i frames\frame_%04d.jpg -i trailer.wav `
-  -af volume=-2dB -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p `
-  -profile:v high -level 4.1 -c:a aac -b:a 192k -ar 44100 `
-  -shortest -movflags +faststart cofretabs-trailer-1080p30.mp4
+ffmpeg -y -framerate 30 -i rendered\frame_%04d.jpg -i trailer.wav -af volume=-2dB `
+  -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -profile:v high -level 4.1 `
+  -c:a aac -b:a 192k -ar 44100 -shortest -movflags +faststart cofretabs-trailer-1080p30.mp4
+
+ffmpeg -y -framerate 30 -i rendered\frame_%04d.jpg -i trailer.wav -af volume=-2dB `
+  -c:v libvpx-vp9 -crf 30 -b:v 0 -pix_fmt yuv420p -row-mt 1 -deadline good -cpu-used 2 `
+  -c:a libopus -b:a 160k -ar 48000 -shortest cofretabs-trailer-1080p30.webm
 ```
+
+## Verify
+
+- ffprobe both files: ≈30.0s, 1920×1080, 30/1 fps, h264+aac / vp9+opus.
+- Full decode to null with no errors.
+- `volumedetect` on the audio: mean ≈ −12 dB, peak ≈ −0.4 dB.
+- A 1fps contact sheet of the encoded MP4 reviewed frame by frame
+  (`../trailer-v2/review/sheet30-*.jpg`).
 
 ## Copy / claims
 
@@ -40,12 +68,13 @@ dark/light themes), local-only behaviour, MIT license, and the GitHub URL.
 "Chrome 102+ · Edge · Brave · Vivaldi · Opera" matches `README.md`
 (Chromium browsers with Manifest V3 support — not store availability).
 
-## Regenerating
+## v1 history
 
-```powershell
-node make-audio.mjs        # 1. music
-node capture-frames.mjs    # 2. frames (needs Chrome, ~2.5 min)
-# 3. ffmpeg command above (needs ffmpeg on PATH or full path)
-```
+The v1 pipeline (synthwave neon-type scenes over three static screenshots,
+96 BPM A minor) is kept in this folder for history: `trailer.html`,
+`make-audio.mjs`, `capture-frames.mjs`, `trailer.wav` and `assets/` here are
+the v1 versions. The current outputs are produced entirely by `../trailer-v2`.
 
-`frames/`, `frames-smoke/` and `check-*.jpg` are scratch artifacts (gitignored).
+`frames/`, `frames-smoke/` and `check-*.jpg` are scratch artifacts (gitignored);
+same for `frames/`, `rendered/`, `review/` and calibration screenshots in
+`../trailer-v2/`.

@@ -1,0 +1,28 @@
+# scratch artifacts of the trailer pipeline (regenerate with the scripts)
+frames/
+frames-smoke/
+rendered/
+review/
+*.png
+
+# superseded iteration scripts, kept locally only
+record.ps1
+record-retake.ps1
+record-retake2.ps1
+prep-retake2.ps1
+measure-library.js
+measure-panel.js
+fix-repair4.js
+fix-timestamps.js
+fix-timestamps3.js
+verify-timestamps.js
+
+# retake-2 footage that failed audit (replaced by the retake-3 clips above)
+clips/c09-panel-close.mp4
+clips/c10-open-library.mp4
+clips/c11-library-scroll.mp4
+clips/c12-edit-note.mp4
+clips/c16-folder-view.mp4
+clips/c17-trash-restore.mp4
+clips/c18-library-search.mp4
+clips/c19-clear-idle.mp4

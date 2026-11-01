@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CofreTabs — Trailer v2 (frame renderer)</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  canvas { display: block; width: 1920px; height: 1080px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script src="frames/manifest.js"></script>
+<script>
+/* ===========================================================================
+   CofreTabs 30s trailer v2 — deterministic frame renderer over REAL FOOTAGE.
+   Everything is a pure function of t (seconds). The capture driver calls
+   await window.__seek(t) then screenshots the canvas. No timers, no randomness
+   that isn't seeded per-frame.
+   Beat grid: 128 BPM — beat = 0.46875s, bar = 1.875s, 64 beats = 30.000s,
+   locked to docs/trailer-v2/make-audio.mjs.
+   Footage: frames/<entry>/fNNNN.jpg extracted by extract-frames.mjs; the
+   manifest (frames/manifest.js) maps entry -> { src, start, count, fps }.
+   =========================================================================== */
+const W = 1920, H = 1080, FR = 30
+const BPM = 128, BEAT = 60 / BPM
+const b = (n) => n * BEAT
+
+const cv = document.getElementById('c')
+const ctx = cv.getContext('2d', { alpha: false })
+
+const DISPLAY = '"Arial Black", "Segoe UI", sans-serif'
+const MONO = 'Consolas, "Courier New", monospace'
+const LEMON = '#d9ff3d'
+const GREEN = '#29ffa8'
+const MAGENTA = '#ff2d95'
+const CYAN = '#16e0ff'
+const DIM = '#8fa07a'
+
+const clamp01 = (x) => Math.max(0, Math.min(1, x))
+const easeOut = (p) => 1 - Math.pow(1 - clamp01(p), 3)
+function easeOutBack(p) {
+  p = clamp01(p); const c = 1.9
+  return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2)
+}
+
+// --- deterministic prng -----------------------------------------------------
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+let R = mulberry32(1)
+const seedFrame = (t) => { R = mulberry32((Math.round(t * FR) * 2654435761) >>> 0) }
+let T = 0 // current trailer time, set by draw(); helpers read it
+
+// --- text helpers (from v1) -------------------------------------------------
+function neonText(txt, x, y, px, o = {}) {
+  const {
+    color = LEMON, glow = color, font = DISPLAY, align = 'center', weight = 900,
+    alpha = 1, sc = 1, chroma = 0, blur = 40, ls = 0,
+  } = o
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.translate(x, y)
+  ctx.scale(sc, sc)
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.font = `${weight} ${px}px ${font}`
+  if (ls) ctx.letterSpacing = `${ls}px`
+  if (chroma > 0.5) {
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.shadowBlur = 0
+    ctx.fillStyle = 'rgba(255,45,149,0.85)'; ctx.fillText(txt, -chroma, 0)
+    ctx.fillStyle = 'rgba(22,224,255,0.85)'; ctx.fillText(txt, chroma, 0)
+    ctx.globalCompositeOperation = 'source-over'
+  }
+  ctx.shadowColor = glow
+  ctx.shadowBlur = blur
+  ctx.fillStyle = color
+  ctx.fillText(txt, 0, 0)
+  ctx.fillText(txt, 0, 0)
+  ctx.shadowBlur = 0
+  ctx.fillText(txt, 0, 0)
+  ctx.restore()
+}
+
+function monoLabel(txt, x, y, px, o = {}) {
+  const { color = GREEN, align = 'center', alpha = 1, ls = px * 0.22, weight = 700 } = o
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.textAlign = align
+  ctx.textBaseline = 'middle'
+  ctx.font = `${weight} ${px}px ${MONO}`
+  ctx.letterSpacing = `${ls}px`
+  ctx.fillStyle = color
+  ctx.shadowColor = color
+  ctx.shadowBlur = 18
+  ctx.fillText(txt, x, y)
+  ctx.restore()
+}
+
+// CMD terminal line: typewriter + blinking cursor, left-anchored, with a soft
+// dark plate behind it so it stays readable over the footage.
+function cmdLine(txt, x, y, px, o = {}) {
+  const { color = GREEN, alpha = 1, cursor = false } = o
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.font = `700 ${px}px ${MONO}`
+  ctx.letterSpacing = '2px'
+  const w = ctx.measureText(txt).width + px * 1.6
+  const g = ctx.createLinearGradient(x - 18, 0, x + w, 0)
+  g.addColorStop(0, 'rgba(4,2,10,0.78)')
+  g.addColorStop(1, 'rgba(4,2,10,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(x - 18, y - px * 0.95, w + 18, px * 1.9)
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = color
+  ctx.shadowColor = color
+  ctx.shadowBlur = 14
+  ctx.fillText(txt, x, y)
+  if (cursor && Math.floor(performance.now() / 1) % 1 === 0) { /* static frames: blink by t below */ }
+  ctx.restore()
+}
+
+// typed CMD line driven purely by the current time T
+function typedCmd(full, tStart, tEnd, x, y, px, o = {}) {
+  const { color = GREEN, cps = 26 } = o
+  if (T < tStart) return
+  const dt = T - tStart
+  const n = Math.min(full.length, Math.floor(dt * cps))
+  const typing = n < full.length
+  const blink = Math.floor(dt * 2.4) % 2 === 0
+  const shown = full.slice(0, n) + (typing || blink ? '_' : '')
+  const fade = tEnd ? clamp01((tEnd - T) / 0.3) : 1
+  cmdLine(shown, x, y, px, { color, alpha: fade })
+}
+
+function punch(txt, tStart, x, y, px, o = {}) {
+  if (T < tStart) return
+  const p = (T - tStart) / 0.34
+  const a = clamp01((T - tStart) * 9)
+  const sc = 1 + 0.22 * (1 - easeOutBack(Math.min(p, 1)))
+  const ch = Math.max(0, 18 - (T - tStart) * 120)
+  neonText(txt, x, y, px, { alpha: a, sc, chroma: ch, blur: 46, ...o })
+}
+
+function chip(txt, x, y, ts, o = {}) {
+  const p = (T - ts) / 0.28
+  if (p <= 0) return
+  const a = clamp01(p * 2.5), sc = 0.7 + 0.3 * easeOutBack(Math.min(p, 1))
+  const px = o.px || 34
+  ctx.save()
+  ctx.font = `700 ${px}px ${MONO}`
+  const w = ctx.measureText(txt).width + px * 1.6
+  const h = px * 2.1
+  ctx.globalAlpha = a
+  ctx.translate(x, y)
+  ctx.scale(sc, sc)
+  ctx.fillStyle = 'rgba(8,4,18,0.88)'
+  ctx.strokeStyle = o.border || LEMON
+  ctx.lineWidth = 3
+  ctx.shadowColor = o.border || LEMON
+  ctx.shadowBlur = 20
+  ctx.fillRect(-w / 2, -h / 2, w, h)
+  ctx.strokeRect(-w / 2, -h / 2, w, h)
+  ctx.shadowBlur = 0
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+  ctx.fillStyle = o.color || LEMON
+  ctx.fillText(txt, 0, 2)
+  ctx.restore()
+}
+
+// --- cut map ----------------------------------------------------------------
+// entry: { id (frames folder + source clip), b0, b1 (beat range), tIn (footage
+// second at b0), scale (zoom into the 1920x1040 source), fx/fy (focus point),
+// drift (slow extra zoom per second) }
+// tIn values are tuned against the retake-3 footage so key on-screen actions
+// land on musical accents: c10's library reveal hits drop 2 at 15.0s, c14's
+// theme flip hits the light crash at 21.125s, c12b's save hits b39+1, c17b's
+// restore toast lands just before drop 3 at 26.25s. Action times were pinned
+// from 10fps precision tiles in review/px*.jpg.
+const CUTS = [
+  { id: 'c01',  b0: 0,    b1: 7,    tIn: 0.5,  scale: 1.5,  fx: 960, fy: 90,   drift: 0.020 },
+  { id: 'c02',  b0: 7,    b1: 9,    tIn: 0.78, scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c03',  b0: 9,    b1: 13,   tIn: 0.63, scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c04',  b0: 13,   b1: 17,   tIn: 2.4,  scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c05',  b0: 17,   b1: 19,   tIn: 0.88, scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c06',  b0: 19,   b1: 21,   tIn: 1.48, scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c07',  b0: 21,   b1: 24,   tIn: 2.9,  scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c08',  b0: 24,   b1: 27,   tIn: 4.45, scale: 1.3,  fx: 960,  fy: 300, drift: 0.015 },
+  { id: 'c09',  b0: 27,   b1: 29,   tIn: 3.4,  scale: 1.35, fx: 1420, fy: 560, drift: 0.015 },
+  { id: 'c10',  b0: 29,   b1: 33,   tIn: 3.95, scale: 1.15, fx: 960,  fy: 520, drift: 0.012 },
+  { id: 'c11',  b0: 33,   b1: 36,   tIn: 3.3,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c12a', b0: 36,   b1: 39,   tIn: 3.6,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c12b', b0: 39,   b1: 41,   tIn: 9.4,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c13',  b0: 41,   b1: 44,   tIn: 3.4,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c14',  b0: 44,   b1: 49,   tIn: 3.13, scale: 1.15, fx: 960,  fy: 520, drift: 0.012 },
+  { id: 'c15',  b0: 49,   b1: 51,   tIn: 3.2,  scale: 1.2,  fx: 960,  fy: 450, drift: 0.012 },
+  { id: 'c16',  b0: 51,   b1: 53,   tIn: 2.2,  scale: 1.2,  fx: 960,  fy: 450, drift: 0.012 },
+  { id: 'c17a', b0: 53,   b1: 54.5, tIn: 2.6,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c17b', b0: 54.5, b1: 56,   tIn: 3.25, scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c18',  b0: 56,   b1: 57.5, tIn: 4.25, scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c19',  b0: 57.5, b1: 58.5, tIn: 4.4,  scale: 1.25, fx: 960,  fy: 500, drift: 0.012 },
+  { id: 'c20',  b0: 58.5, b1: 64,   tIn: 4.7,  scale: 1.1,  fx: 960,  fy: 500, drift: 0.010 },
+]
+const CUT_TIMES = CUTS.slice(1).map((c) => b(c.b0))
+const WHIPS = [b(29), b(44)]           // whip-pan into c10 (drop 2) and c14
+const DROPS = [b(8), b(32), b(56)]     // lemon flashes on the three drops
+const THEME_FLIPS = [21.125, 22.9]     // light crash + flip-back white flashes
+
+// --- footage ----------------------------------------------------------------
+const MAN = window.__MANIFEST || {}
+const frameCache = new Map()
+async function getFrame(id, srcT) {
+  const m = MAN[id]
+  if (!m) return null
+  let idx = Math.round((srcT - m.start) * m.fps)
+  idx = Math.max(0, Math.min(m.count - 1, idx))
+  const key = id + ':' + idx
+  let im = frameCache.get(key)
+  if (!im) {
+    im = new Image()
+    im.src = `frames/${id}/f${String(idx).padStart(4, '0')}.jpg`
+    try { await im.decode() } catch { return null }
+    frameCache.set(key, im)
+    if (frameCache.size > 8) frameCache.delete(frameCache.keys().next().value)
+  }
+  return im
+}
+
+function cutAt(t) {
+  let cur = CUTS[0]
+  for (const c of CUTS) if (t >= b(c.b0)) cur = c
+  return cur
+}
+
+function drawFootage(im, c, zoom, whipX) {
+  const mw = im.naturalWidth || 1920
+  const mh = im.naturalHeight || 1040
+  const cw = mw / (c.scale * zoom)
+  const ch = mh / (c.scale * zoom)
+  let sx = c.fx - cw / 2
+  let sy = c.fy - ch / 2
+  sx = Math.max(0, Math.min(mw - cw, sx))
+  sy = Math.max(0, Math.min(mh - ch, sy))
+  if (whipX) {
+    // motion-blur whip: wrapped copies + ghost trail
+    for (const [dx, a] of [[whipX - 1920, 1], [whipX, 1], [whipX + 1920, 1], [whipX + 70, 0.3], [whipX + 140, 0.18]]) {
+      ctx.save()
+      ctx.globalAlpha = a
+      ctx.drawImage(im, sx, sy, cw, ch, dx, 0, W, H)
+      ctx.restore()
+    }
+  } else {
+    ctx.drawImage(im, sx, sy, cw, ch, 0, 0, W, H)
+  }
+}
+
+// --- beat-locked motion -----------------------------------------------------
+function pumpAt(t) {
+  if (t >= b(52) && t < b(56)) return 1          // breakdown: no pump
+  const phase = (t % BEAT) / BEAT
+  return 1 + 0.010 * Math.exp(-phase * 6)
+}
+
+function punchScale(t) {
+  let s = 1
+  for (const c of CUT_TIMES) {
+    const d = t - c
+    if (d >= 0 && d < 0.34) s = Math.max(s, 1 + 0.10 * (1 - easeOutBack(d / 0.34)))
+  }
+  return s
+}
+
+function whipX(t) {
+  for (const w of WHIPS) {
+    const d = t - w
+    if (d >= -0.2 && d < 0) {
+      const k = (d + 0.2) / 0.2
+      return 340 * (1 - k) * (1 - k)
+    }
+  }
+  return 0
+}
+
+function glitchAmount(t) {
+  for (const c of CUT_TIMES) {
+    const d = t - c
+    if (d >= 0 && d < 0.16) return 1 - d / 0.16
+  }
+  for (const d0 of DROPS) {
+    if (t >= d0 - 0.15 && t < d0) return 0.5 + 0.5 * ((t - (d0 - 0.15)) / 0.15)
+  }
+  if (t >= b(52) && t < b(53)) return 0.3        // breakdown shimmer
+  return 0
+}
+
+function glitchTear(amount) {
+  if (amount <= 0.01) return
+  const n = Math.round(3 + amount * 9)
+  for (let i = 0; i < n; i++) {
+    const sy = R() * H
+    const sh = 6 + R() * 70 * amount
+    const dx = (R() * 2 - 1) * 160 * amount
+    ctx.drawImage(cv, 0, sy, W, sh, dx, sy, W, sh)
+  }
+}
+
+// --- text timeline ----------------------------------------------------------
+function textAt(t) {
+  // ---- intro: boot line + taglines over c01 ----
+  if (t < b(7)) {
+    typedCmd('> madwolf studios presents', 0.15, b(6.5), 80, 985, 34, { color: DIM, cps: 24 })
+    punch('YOUR TABS.', b(1), 960, 330, 132)
+    punch('YOUR VAULT.', b(3), 960, 540, 132)
+    punch('YOUR DEVICE.', b(5), 960, 750, 132)
+    return
+  }
+  // ---- c02: panel opens on drop 1 ----
+  if (t < b(9)) {
+    typedCmd('> open the panel — ctrl+shift+p', b(8), b(8.9), 80, 985, 34, { color: GREEN, cps: 34 })
+    return
+  }
+  // ---- c03: save ----
+  if (t < b(13)) {
+    monoLabel('// ONE CLICK', 80, 300, 40, { align: 'left', alpha: clamp01((t - b(12)) * 4), ls: 14 })
+    punch('SAVED.', b(12), 560, 540, 150, { color: GREEN, glow: GREEN })
+    typedCmd('> nothing leaves your device', b(12.5), b(13), 80, 985, 32, { color: DIM, cps: 30 })
+    return
+  }
+  // ---- c04: search ----
+  if (t < b(17)) {
+    typedCmd('> find "godot" — instant', b(13), b(16.8), 80, 985, 34, { color: GREEN, cps: 30 })
+    return
+  }
+  // ---- c05: clear ----
+  if (t < b(19)) {
+    typedCmd('> clear', b(17), b(18.8), 80, 985, 34, { color: DIM, cps: 20 })
+    return
+  }
+  // ---- c06: favorite ----
+  if (t < b(21)) {
+    punch('PIN WHAT MATTERS', b(19), 560, 540, 96)
+    return
+  }
+  // ---- c07: trash ----
+  if (t < b(24)) {
+    punch('TRASH IT.', b(21), 560, 470, 132)
+    monoLabel('RESTORE ANYTIME.', 560, 620, 40, { alpha: clamp01((t - b(22.5)) * 4), color: GREEN, ls: 10 })
+    return
+  }
+  // ---- c08: open tab ----
+  if (t < b(29)) {
+    typedCmd('> one click = new tab', b(24), b(28.8), 80, 985, 34, { color: GREEN, cps: 30 })
+    return
+  }
+  // ---- c10: library reveal on drop 2 ----
+  if (t < b(32)) {
+    typedCmd('> open the vault_', b(29), b(31.8), 80, 985, 34, { color: GREEN, cps: 26 })
+    return
+  }
+  // ---- c11: the full vault + chips ----
+  if (t < b(36)) {
+    punch('THE FULL VAULT', b(32), 960, 120, 88)
+    chip('★ FAVORITES', 270, 430, b(33))
+    chip('CUSTOM FOLDERS', 255, 640, b(34), { border: GREEN, color: GREEN })
+    chip('NOTES ON TABS', 1660, 430, b(35), { border: CYAN, color: CYAN })
+    chip('TRASH', 1660, 640, b(35.5))
+    return
+  }
+  // ---- c12: notes ----
+  if (t < b(41)) {
+    typedCmd('> write a note_', b(36), b(40.8), 80, 985, 34, { color: CYAN, cps: 26 })
+    return
+  }
+  // ---- c13: move ----
+  if (t < b(44)) {
+    monoLabel('// MOVE TO FOLDER', 80, 985, 34, { align: 'left', alpha: clamp01((t - b(41)) * 4), color: GREEN, ls: 8 })
+    return
+  }
+  // ---- c14: theme flip (light crash at 21.125) ----
+  if (t < b(49)) {
+    monoLabel('// EASY ON THE EYES', 980, 300, 40, { align: 'left', alpha: clamp01((t - b(44.5)) * 4), ls: 14 })
+    punch('DARK & LIGHT', b(45), 980, 440, 92, { align: 'left' })
+    punch('THEMES', b(46), 980, 570, 92, { color: GREEN, glow: GREEN, align: 'left' })
+    monoLabel('v1.1.0 SHIPS BOTH.', 980, 690, 30, { align: 'left', alpha: clamp01((t - b(47)) * 4), color: DIM, ls: 6, px: 30 })
+    return
+  }
+  // ---- breakdown: open source ----
+  if (t < b(56)) {
+    punch('OPEN SOURCE', b(52), 960, 440, 150, { color: '#cfd8c0', glow: '#cfd8c0' })
+    monoLabel('MIT LICENSE · AUDIT THE CODE', 960, 610, 44, { alpha: clamp01((t - b(53)) * 3), color: GREEN, ls: 12, px: 44 })
+    return
+  }
+  // ---- final: FREE over the rapid-fire ----
+  if (t < b(59)) {
+    punch('FREE.', b(56), 960, 430, 260)
+    punch('& OPEN SOURCE.', b(57), 960, 670, 130, { color: GREEN, glow: GREEN })
+    return
+  }
+  // ---- final card over c20 ----
+  const cardT = b(59)
+  const ch = Math.max(0, 30 - (t - cardT) * 160)
+  punch('COFRETABS', cardT, 960, 340, 196, { chroma: ch, blur: 64, ls: 6 })
+  monoLabel('YOUR TABS. YOUR VAULT. YOUR DEVICE.', 960, 490, 40, { color: GREEN, alpha: clamp01((t - (cardT + 0.55)) * 4), ls: 9, px: 40 })
+  const cp = clamp01((t - (cardT + 0.85)) * 4)
+  if (cp > 0) {
+    const sc2 = 0.85 + 0.15 * easeOutBack(clamp01((t - (cardT + 0.85)) / 0.3))
+    ctx.save()
+    ctx.globalAlpha = cp
+    ctx.translate(960, 650)
+    ctx.scale(sc2, sc2)
+    ctx.font = `900 56px ${DISPLAY}`
+    const label = 'INSTALL FREE ↗'
+    const w = ctx.measureText(label).width + 130
+    ctx.fillStyle = 'rgba(8,4,18,0.9)'
+    ctx.strokeStyle = LEMON
+    ctx.lineWidth = 4
+    ctx.shadowColor = LEMON
+    ctx.shadowBlur = 30
+    ctx.fillRect(-w / 2, -52, w, 104)
+    ctx.strokeRect(-w / 2, -52, w, 104)
+    ctx.shadowBlur = 24
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = LEMON
+    ctx.fillText(label, 0, 4)
+    ctx.restore()
+    monoLabel('github.com/MadalinWolf/CofreTabs', 960, 755, 44, { color: LEMON, alpha: cp, ls: 6, px: 44 })
+  }
+  monoLabel('CHROME 102+ · EDGE · BRAVE · VIVALDI · OPERA', 960, 870, 33, { color: DIM, alpha: clamp01((t - (cardT + 1.25)) * 4), ls: 8, px: 33 })
+  chip('[ FREE & OPEN SOURCE · MIT ]', 960, 955, cardT + 1.45, { border: GREEN, color: GREEN, px: 36 })
+  monoLabel('MADWOLF STUDIOS', 960, 1032, 24, { color: DIM, alpha: clamp01((t - (cardT + 1.35)) * 3), ls: 14, px: 24 })
+}
+
+// --- overlays ---------------------------------------------------------------
+function overlays(t) {
+  // drop flashes
+  for (const f of DROPS) {
+    const d = t - f
+    if (d >= 0 && d < 0.14) {
+      ctx.fillStyle = `rgba(217,255,61,${0.75 * (1 - d / 0.14)})`
+      ctx.fillRect(0, 0, W, H)
+    }
+  }
+  // theme-flip white flashes (light crash / flip back)
+  for (const f of THEME_FLIPS) {
+    const d = t - f
+    if (d >= 0 && d < 0.12) {
+      ctx.fillStyle = `rgba(255,255,255,${0.55 * (1 - d / 0.12)})`
+      ctx.fillRect(0, 0, W, H)
+    }
+  }
+  // bottom scrim for CMD text legibility
+  const scrim = ctx.createLinearGradient(0, H - 170, 0, H)
+  scrim.addColorStop(0, 'rgba(4,2,10,0)')
+  scrim.addColorStop(1, 'rgba(4,2,10,0.55)')
+  ctx.fillStyle = scrim
+  ctx.fillRect(0, H - 170, W, 170)
+  // scanlines
+  ctx.fillStyle = 'rgba(0,0,0,0.14)'
+  for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1)
+  // grain
+  for (let i = 0; i < 420; i++) {
+    const x = R() * W, y = R() * H, s = 1 + R() * 2.6
+    ctx.fillStyle = `rgba(255,255,255,${R() * 0.05})`
+    ctx.fillRect(x, y, s, s)
+  }
+  // vignette
+  const v = ctx.createRadialGradient(960, 540, 360, 960, 540, 1180)
+  v.addColorStop(0, 'rgba(0,0,0,0)')
+  v.addColorStop(1, 'rgba(0,0,0,0.62)')
+  ctx.fillStyle = v
+  ctx.fillRect(0, 0, W, H)
+  // end fade
+  if (t > 29.5) {
+    ctx.fillStyle = `rgba(0,0,0,${clamp01((t - 29.5) / 0.5)})`
+    ctx.fillRect(0, 0, W, H)
+  }
+}
+
+// --- main -------------------------------------------------------------------
+async function draw(t) {
+  T = t
+  seedFrame(t)
+  ctx.globalAlpha = 1
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.fillStyle = '#000'
+  ctx.fillRect(0, 0, W, H)
+
+  const c = cutAt(t)
+  const srcT = c.tIn + (t - b(c.b0))
+  const im = await getFrame(c.id, srcT)
+  const zoom = pumpAt(t) * punchScale(t) * (1 + (c.drift || 0.012) * (t - b(c.b0)))
+  const wx = whipX(t)
+  if (im) drawFootage(im, c, zoom, wx)
+  else {
+    // fallback plate if a frame is missing (should not happen in capture)
+    ctx.fillStyle = '#0b0818'
+    ctx.fillRect(0, 0, W, H)
+  }
+  textAt(t)
+  overlays(t)
+  glitchTear(glitchAmount(t))
+}
+
+// capture driver contract
+window.__seek = async (t) => { await draw(t); return true }
+window.__ready = (async () => {
+  await new Promise((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', r)))
+  await draw(0)
+  return true
+})()
+</script>
+</body>
+</html>
