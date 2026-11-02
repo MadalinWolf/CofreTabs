@@ -15,6 +15,13 @@ CofreTabs is a Manifest V3 browser extension that turns the tab you're reading i
 
 Everything lives in IndexedDB inside your browser profile. There is no backend, account, or cloud sync.
 
+<p align="center">
+  <a href="docs/trailer/cofretabs-trailer-1080p30.mp4">
+    <img src="docs/trailer/trailer-preview.gif" alt="CofreTabs 30-second trailer — real in-browser footage, click to watch with sound">
+  </a>
+</p>
+<p align="center"><sub>▶ 30-second trailer — real footage, in-browser. Click it for sound · <a href="docs/trailer/">full resolution + how it was made</a></sub></p>
+
 ---
 
 **💾 LOCAL FIRST** · **👤 NO ACCOUNTS** · **☁️ NO CLOUD** · **🚫 NO TRACKING** · **📡 NO TELEMETRY**
