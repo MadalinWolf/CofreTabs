@@ -30,6 +30,8 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 ---
 
+---
+
 ## 🚀 Get CofreTabs
 
 
@@ -55,124 +57,6 @@ For the latest updates and source code, visit the [GitHub repository](https://gi
 **Browser compatibility:** Chrome 102+, Microsoft Edge 102+, Brave, Vivaldi, and Opera (Chromium-based browsers supporting Manifest V3).
 
 *Browser compatibility does not mean the extension is available in each browser's official add-on store.*
-
----
-
----
-
-
-## ❤️ Support Independent Development
-
-CofreTabs is an independent project created by **MadalinWolf**, and it's **free everywhere** — on GitHub, Gumroad, and every platform where it's available.
-
-If CofreTabs helps you organize your browsing, you can support its continued development by starring the repository, sharing it with others, or making a voluntary contribution.
-
-**All features are free for everyone.** Contributions are entirely optional, and supporters don't receive exclusive features or advantages.
-
-| Support | Link |
-|:--|:--|
-| ⭐ Star the project | [GitHub Repository](https://github.com/MadalinWolf/CofreTabs) |
-| 🐺 Follow the developer | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
-| ❤️ GitHub Sponsors | [Become a Sponsor](https://github.com/sponsors/MadalinWolf) |
-| 🛍️ Gumroad | [Download Free or Support Development](https://madalinwolf.gumroad.com/l/cofretabs) |
-| ☕ Ko-fi | Coming soon |
-| 🎮 itch.io | Coming soon |
-
-> 💚 **Love CofreTabs?** A GitHub star, a recommendation, or an optional contribution helps keep independent development going. Thank you!
-
-### 🐱 Help feed the Studio Cat
-
-The Studio Cat has no understanding of software licensing, database integrity, or release engineering.
-
-The Studio Cat does understand snacks.
-
-Your support helps keep independent development, testing, documentation, and future improvements going.
-
-*GitHub Sponsors is the configured support destination listed here. Ko-fi, itch.io, and Gumroad are planned, not active payment links.*
-
----
-
-## 🔗 Official Links
-
-- 🐺 **Studio:** [MadWolf Studios](https://madwolfstudios.com/)
-- 💻 **Source code:** [GitHub Repository](https://github.com/MadalinWolf/CofreTabs)
-- 📦 **Releases:** [GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases)
-- 📝 **Privacy policy:** [`docs/PRIVACY.md`](docs/PRIVACY.md)
-- 🛠️ **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- 🔐 **Security reporting:** [`SECURITY.md`](SECURITY.md)
-- 📋 **Store preparation:** [`docs/STORE.md`](docs/STORE.md) · [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md)
-
----
-
-## 🖥️ Take a Look Inside
-
-The screenshots below were captured from the real v1.1.0 build in Chrome, using the actual panel and library code with a local fixture page and demo data. No personal browsing data is shown. See [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture details.
-
-### The save panel
-
-Review the current page — title, host, automatic folder and the 3×3 folder grid — before deciding whether to save it.
-
-![CofreTabs v1.1.0 slide-over save panel with the folder grid](docs/screenshots/panel-v1.1.0.png)
-
-### Save confirmed
-
-The success state appears after the local database confirms the write.
-
-![CofreTabs v1.1.0 panel showing an acknowledged save](docs/screenshots/panel-saved-v1.1.0.png)
-
-### The library — dark theme
-
-Favorites, custom folders, saved tabs with notes, MOVE controls and the theme switch.
-
-![CofreTabs v1.1.0 library in the dark theme](docs/screenshots/library-v1.1.0.png)
-
-### The library — light theme
-
-The same vault in the light theme — the switch persists across launches and defaults to your system preference.
-
-![CofreTabs v1.1.0 library in the light theme](docs/screenshots/library-light-v1.1.0.png)
-
-### The panel in the light theme
-
-![CofreTabs v1.1.0 save panel in the light theme](docs/screenshots/panel-light-v1.1.0.png)
-
-### Favorites
-
-Heart any saved tab to collect it in the Favorites view — favoriting is a tag, the tab stays in its folder.
-
-![CofreTabs v1.1.0 Favorites view](docs/screenshots/favorites-v1.1.0.png)
-
-### Search
-
-Search matches title, URL, hostname, folder and notes.
-
-![CofreTabs v1.1.0 library search results](docs/screenshots/search-v1.1.0.png)
-
-### Trash
-
-Restore a trashed tab, delete it forever, or empty the Trash.
-
-![CofreTabs v1.1.0 Trash view](docs/screenshots/trash-v1.1.0.png)
-
-### Backup import
-
-The import dialog validates the whole file and previews it before you choose merge or replace mode.
-
-![CofreTabs v1.1.0 backup import dialog](docs/screenshots/import-v1.1.0.png)
-
-> The original v1.0.0 captures are kept alongside these in [`docs/screenshots/`](docs/screenshots/) (`panel.png`, `panel-saved.png`, `library.png`).
-
----
-
-## ⚡ The 30-second version
-
-1. Build and load the unpacked extension using the instructions below.
-2. Browse to a normal `http(s)` page.
-3. Click the CofreTabs toolbar icon.
-4. Review the page details and press **SAVE THIS TAB**.
-5. Open the library to search, organize, edit, restore, or back up your collection.
-
-> **No automatic saving.** Clicking the toolbar icon opens the panel; it does not save the page. The vault is written only after you explicitly press the save button. Success is shown only after IndexedDB confirms the write.
 
 ---
 
@@ -314,6 +198,78 @@ See [Why these permissions?](#-privacy) for the explanation of each permission.
 
 ---
 
+## 🖥️ Take a Look Inside
+
+The screenshots below were captured from the real v1.1.0 build in Chrome, using the actual panel and library code with a local fixture page and demo data. No personal browsing data is shown. See [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture details.
+
+### The save panel
+
+Review the current page — title, host, automatic folder and the 3×3 folder grid — before deciding whether to save it.
+
+![CofreTabs v1.1.0 slide-over save panel with the folder grid](docs/screenshots/panel-v1.1.0.png)
+
+### Save confirmed
+
+The success state appears after the local database confirms the write.
+
+![CofreTabs v1.1.0 panel showing an acknowledged save](docs/screenshots/panel-saved-v1.1.0.png)
+
+### The library — dark theme
+
+Favorites, custom folders, saved tabs with notes, MOVE controls and the theme switch.
+
+![CofreTabs v1.1.0 library in the dark theme](docs/screenshots/library-v1.1.0.png)
+
+### The library — light theme
+
+The same vault in the light theme — the switch persists across launches and defaults to your system preference.
+
+![CofreTabs v1.1.0 library in the light theme](docs/screenshots/library-light-v1.1.0.png)
+
+### The panel in the light theme
+
+![CofreTabs v1.1.0 save panel in the light theme](docs/screenshots/panel-light-v1.1.0.png)
+
+### Favorites
+
+Heart any saved tab to collect it in the Favorites view — favoriting is a tag, the tab stays in its folder.
+
+![CofreTabs v1.1.0 Favorites view](docs/screenshots/favorites-v1.1.0.png)
+
+### Search
+
+Search matches title, URL, hostname, folder and notes.
+
+![CofreTabs v1.1.0 library search results](docs/screenshots/search-v1.1.0.png)
+
+### Trash
+
+Restore a trashed tab, delete it forever, or empty the Trash.
+
+![CofreTabs v1.1.0 Trash view](docs/screenshots/trash-v1.1.0.png)
+
+### Backup import
+
+The import dialog validates the whole file and previews it before you choose merge or replace mode.
+
+![CofreTabs v1.1.0 backup import dialog](docs/screenshots/import-v1.1.0.png)
+
+> The original v1.0.0 captures are kept alongside these in [`docs/screenshots/`](docs/screenshots/) (`panel.png`, `panel-saved.png`, `library.png`).
+
+---
+
+## ⚡ The 30-second version
+
+1. Build and load the unpacked extension using the instructions below.
+2. Browse to a normal `http(s)` page.
+3. Click the CofreTabs toolbar icon.
+4. Review the page details and press **SAVE THIS TAB**.
+5. Open the library to search, organize, edit, restore, or back up your collection.
+
+> **No automatic saving.** Clicking the toolbar icon opens the panel; it does not save the page. The vault is written only after you explicitly press the save button. Success is shown only after IndexedDB confirms the write.
+
+---
+
 ## 📥 Installation
 
 CofreTabs supports Chromium-based browsers with Manifest V3: **Chrome 102+ · Edge 102+ · Brave · Vivaldi · Opera**.
@@ -446,23 +402,6 @@ That's the declared permission list. The service worker uses the browser's tab A
 
 ---
 
-## 📦 Release Status
-
-**Version in the source manifest and package metadata: `1.1.0`.**
-
-| Item | Status |
-|:--|:--|
-| Source repository | ✅ Public |
-| Current version | `1.1.0` |
-| Price | ✅ Free (donations optional) |
-| Chrome Web Store | Not published |
-| Microsoft Edge Add-ons | Not published |
-| GitHub Releases | ✅ [CofreTabs v1.1.0 — View release](https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0) |
-
-Store listing copy and submission preparation are documented in [`docs/STORE.md`](docs/STORE.md) and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
-
----
-
 ## ❓ FAQ
 
 **Does CofreTabs sync between devices?**  
@@ -491,6 +430,23 @@ CofreTabs does not fetch remote favicon URLs. It retains only inline `data:image
 
 **Why can't I find CofreTabs in my browser's extension store?**  
 The store listings are not currently published. Use the manual installation instructions until an official listing becomes available.
+
+---
+
+## 📦 Release Status
+
+**Version in the source manifest and package metadata: `1.1.0`.**
+
+| Item | Status |
+|:--|:--|
+| Source repository | ✅ Public |
+| Current version | `1.1.0` |
+| Price | ✅ Free (donations optional) |
+| Chrome Web Store | Not published |
+| Microsoft Edge Add-ons | Not published |
+| GitHub Releases | ✅ [CofreTabs v1.1.0 — View release](https://github.com/MadalinWolf/CofreTabs/releases/tag/v1.1.0) |
+
+Store listing copy and submission preparation are documented in [`docs/STORE.md`](docs/STORE.md) and [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md).
 
 ---
 
@@ -574,6 +530,49 @@ For security issues, follow [`SECURITY.md`](SECURITY.md) instead of opening a pu
 
 ---
 
+## ❤️ Support Independent Development
+
+CofreTabs is an independent project created by **MadalinWolf**, and it's **free everywhere** — on GitHub, Gumroad, and every platform where it's available.
+
+If CofreTabs helps you organize your browsing, you can support its continued development by starring the repository, sharing it with others, or making a voluntary contribution.
+
+**All features are free for everyone.** Contributions are entirely optional, and supporters don't receive exclusive features or advantages.
+
+| Support | Link |
+|:--|:--|
+| ⭐ Star the project | [GitHub Repository](https://github.com/MadalinWolf/CofreTabs) |
+| 🐺 Follow the developer | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
+| ❤️ GitHub Sponsors | [Become a Sponsor](https://github.com/sponsors/MadalinWolf) |
+| 🛍️ Gumroad | [Download Free or Support Development](https://madalinwolf.gumroad.com/l/cofretabs) |
+| ☕ Ko-fi | Coming soon |
+| 🎮 itch.io | Coming soon |
+
+> 💚 **Love CofreTabs?** A GitHub star, a recommendation, or an optional contribution helps keep independent development going. Thank you!
+
+### 🐱 Help feed the Studio Cat
+
+The Studio Cat has no understanding of software licensing, database integrity, or release engineering.
+
+The Studio Cat does understand snacks.
+
+Your support helps keep independent development, testing, documentation, and future improvements going.
+
+*GitHub Sponsors and Gumroad are available for optional contributions. Ko-fi and itch.io are coming soon.*
+
+---
+
+## 🔗 Official Links
+
+- 🐺 **Website:** [MadWolf Studios](https://madwolfstudios.com/)
+- 💻 **Source code:** [GitHub Repository](https://github.com/MadalinWolf/CofreTabs)
+- 📦 **Releases:** [GitHub Releases](https://github.com/MadalinWolf/CofreTabs/releases)
+- 📝 **Privacy policy:** [`docs/PRIVACY.md`](docs/PRIVACY.md)
+- 🛠️ **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- 🔐 **Security reporting:** [`SECURITY.md`](SECURITY.md)
+- 📋 **Store preparation:** [`docs/STORE.md`](docs/STORE.md) · [`docs/STORE-LISTING.md`](docs/STORE-LISTING.md)
+
+---
+
 ## 📜 License
 
 MIT © 2026 Mad Wolf Studios. See [`LICENSE`](LICENSE).
@@ -583,18 +582,17 @@ Third-party notices: [`docs/THIRD-PARTY.md`](docs/THIRD-PARTY.md).
 ---
 
 ```console
-┌─[ MADWOLF STUDIOS ]────────────────────────────────────────────────┐
+┌─[ MADALINWOLF ]────────────────────────────────────────────────────┐
 │                                                                    │
 │   Thanks for using CofreTabs.                                      │
 │                                                                    │
 │   If this saved your tab sanity:                                   │
-│     ★ star the project  → github.com/MadalinWolf/CofreTabs         │
-│     → follow the studio → github.com/MadalinWolf                   │
+│     ★ star the project  → github.com/MadalinWolf/CofreTabs         |
+│     → follow the creator → github.com/MadalinWolf                  │
 │     ♥ support the work  → github.com/sponsors/MadalinWolf          │
 │                                                                    │
 │   Your tabs. Your vault. Your device.                              │
 │   More experiments: https://madwolfstudios.com/                    │
 │                                                                    │
 └────────────────────────────────────────────────────────────────────┘
-```
 ```
