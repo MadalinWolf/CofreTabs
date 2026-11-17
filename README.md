@@ -36,8 +36,6 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 | Platform | Availability | Get it |
 |:--|:--|:--|
-| 🌐 Chrome Web Store | Not submitted or published | Coming soon |
-| 🟦 Microsoft Edge Add-ons | Not published | Coming soon |
 | 💾 GitHub Releases | ✅ v1.1.0 Published | [View Release & Downloads](https://github.com/MadalinWolf/CofreTabs/releases/latest) |
 
 **CofreTabs is free — every download, every store, forever.** If it saves you time, you can support development below — pay what you want, get nothing extra, keep the app either way.
@@ -63,7 +61,7 @@ CofreTabs is an independent project from **MadWolf Studios**, and it is **free e
 | ❤️ GitHub Sponsors | [Support MadWolf Studios](https://github.com/sponsors/MadalinWolf) |
 | ☕ Ko-fi | Coming soon |
 | 🎮 itch.io | Coming soon |
-| 🛍️ Gumroad | Coming soon |
+| 🛍️ Gumroad - (https://madalinwolf.gumroad.com/l/cofretabs)
 
 ### 🐱 Help feed the Studio Cat
 
@@ -574,7 +572,7 @@ Third-party notices: [`docs/THIRD-PARTY.md`](docs/THIRD-PARTY.md).
 │                                                                    │
 │   If this saved your tab sanity:                                   │
 │     ★ star the project  → github.com/MadalinWolf/CofreTabs         │
-│     → follow the studio → github.com/MadalinWolf                  │
+│     → follow the studio → github.com/MadalinWolf                   │
 │     ♥ support the work  → github.com/sponsors/MadalinWolf          │
 │                                                                    │
 │   Your tabs. Your vault. Your device.                              │
