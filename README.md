@@ -32,13 +32,23 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 ## 🚀 Get CofreTabs
 
+
 ### 📥 Downloads
+
+**CofreTabs v1.1.0 is available for free!**
+
+Choose whichever platform you prefer. Both provide the same free browser extension, with no premium features, subscriptions, or hidden costs.
 
 | Platform | Availability | Get it |
 |:--|:--|:--|
-| 💾 GitHub Releases | ✅ v1.1.0 Published | [View Release & Downloads](https://github.com/MadalinWolf/CofreTabs/releases/latest) |
+| 💾 GitHub Releases | ✅ v1.1.0 Available | [Download from GitHub](https://github.com/MadalinWolf/CofreTabs/releases/latest) |
+| 🛍️ Gumroad | ✅ v1.1.0 Available · Pay What You Want | [Download Free on Gumroad](https://madalinwolf.gumroad.com/l/cofretabs) |
 
-**CofreTabs is free — every download, every store, forever.** If it saves you time, you can support development below — pay what you want, get nothing extra, keep the app either way.
+**💚 Want to support development?** Gumroad lets you choose your own contribution, including **€0**. You can download CofreTabs completely free, or contribute any amount you wish.
+
+**Note:** CofreTabs currently requires manual installation in a Chromium-based browser. Download the extension ZIP, extract it, enable Developer mode on your browser's extensions page, and select **Load unpacked**.
+
+For the latest updates and source code, visit the [GitHub repository](https://github.com/MadalinWolf/CofreTabs).
 
 **Current version:** `1.1.0`
 
@@ -50,18 +60,25 @@ Everything lives in IndexedDB inside your browser profile. There is no backend, 
 
 ---
 
+
 ## ❤️ Support Independent Development
 
-CofreTabs is an independent project from **MadWolf Studios**, and it is **free everywhere** — GitHub, and every store it lands in. If it helps tame your tab collection, sharing the project, starring the repository, or supporting future development with a pay-what-you-want donation makes a difference — but the app never charges and donors never get extra features.
+CofreTabs is an independent project created by **MadalinWolf**, and it's **free everywhere** — on GitHub, Gumroad, and every platform where it's available.
+
+If CofreTabs helps you organize your browsing, you can support its continued development by starring the repository, sharing it with others, or making a voluntary contribution.
+
+**All features are free for everyone.** Contributions are entirely optional, and supporters don't receive exclusive features or advantages.
 
 | Support | Link |
 |:--|:--|
 | ⭐ Star the project | [GitHub Repository](https://github.com/MadalinWolf/CofreTabs) |
-| 🐺 Follow the studio | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
-| ❤️ GitHub Sponsors | [Support MadWolf Studios](https://github.com/sponsors/MadalinWolf) |
+| 🐺 Follow the developer | [MadalinWolf on GitHub](https://github.com/MadalinWolf) |
+| ❤️ GitHub Sponsors | [Become a Sponsor](https://github.com/sponsors/MadalinWolf) |
+| 🛍️ Gumroad | [Download Free or Support Development](https://madalinwolf.gumroad.com/l/cofretabs) |
 | ☕ Ko-fi | Coming soon |
 | 🎮 itch.io | Coming soon |
-| 🛍️ Gumroad - (https://madalinwolf.gumroad.com/l/cofretabs)
+
+> 💚 **Love CofreTabs?** A GitHub star, a recommendation, or an optional contribution helps keep independent development going. Thank you!
 
 ### 🐱 Help feed the Studio Cat
 
